@@ -278,7 +278,7 @@ export function Hero() {
       ref={rootRef}
       style={rootStyle}
       aria-labelledby="hero-title"
-      className={`${satoshi} relative isolate overflow-hidden bg-primary text-white lg:h-[calc(1024px*var(--s))]`}
+      className={`${satoshi} relative isolate overflow-hidden bg-[#003be2] text-white lg:h-[calc(1024px*var(--s))]`}
     >
       {/* Grid (120px cells on desktop, 64px on mobile) */}
       <div

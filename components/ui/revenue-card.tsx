@@ -32,7 +32,7 @@ export function RevenueCard({
       className={cn(
         // Brand-blue in both themes: these cards sit on the light #FAFAFA
         // canvas / dark navy canvas, and #003BE2 keeps AA contrast on both.
-        "w-[176px] rounded-2xl bg-primary px-4 py-3.5 text-white shadow-lg shadow-black/10 sm:w-[196px]",
+        "w-[176px] rounded-2xl bg-[#003be2] px-4 py-3.5 text-white shadow-lg shadow-black/10 sm:w-[196px]",
         className
       )}
     >
