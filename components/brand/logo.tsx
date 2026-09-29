@@ -15,7 +15,7 @@ type LogoProps = {
  */
 export function Logo({ className, withWordmark = true }: LogoProps) {
   return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
+    <span className={cn("inline-flex items-end gap-2", className)}>
       <Image
         src="/images/brand/logo-mark.svg"
         alt=""
@@ -24,10 +24,7 @@ export function Logo({ className, withWordmark = true }: LogoProps) {
         aria-hidden="true"
       />
       {withWordmark ? (
-        // Optical correction: Clash Display's ink (cap-height + the "y"
-        // descender) reads ~1px low when the em box is centered, so the
-        // wordmark is nudged up to align with the mark's visual center.
-        <span className="-translate-y-[0.045em] font-brand text-2xl font-bold leading-none tracking-tight">
+        <span className="translate-y-[0.14em] font-clash text-2xl font-bold leading-none tracking-tight">
           {siteConfig.name}
         </span>
       ) : null}

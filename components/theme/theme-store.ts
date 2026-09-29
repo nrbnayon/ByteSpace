@@ -43,10 +43,30 @@ function ensureInitialized() {
   if (initialized) return;
   initialized = true;
   current = resolve(readStoredMode());
+  applyToDocument(current);
 }
 
 function emit() {
   for (const listener of listeners) listener();
+}
+
+/**
+ * Reflect the resolved theme onto <html> (the `dark` class + colorScheme).
+ * This is what actually switches the visuals — the inline init script only
+ * covers first paint, so every later state change must re-apply it here.
+ */
+function applyToDocument(state: ThemeState): void {
+  if (typeof document === "undefined") return;
+  const dark = state.resolved === "dark";
+  document.documentElement.classList.toggle("dark", dark);
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
+}
+
+/** Single mutation path: update state, reflect to DOM, notify subscribers. */
+function commit(next: ThemeState): void {
+  current = next;
+  applyToDocument(current);
+  emit();
 }
 
 /** Subscribe to theme changes (media query + cross-tab storage events). */
@@ -54,18 +74,16 @@ export function subscribeTheme(onStoreChange: () => void): () => void {
   ensureInitialized();
   // Re-sync with localStorage on every subscription: same-window writes do
   // not fire `storage` events, so a remounting provider must re-read itself.
-  current = resolve(readStoredMode());
+  commit(resolve(readStoredMode()));
 
   const media = window.matchMedia("(prefers-color-scheme: dark)");
   const onSystemChange = () => {
     if (current.mode !== "system") return;
-    current = resolve("system");
-    emit();
+    commit(resolve("system"));
   };
   const onStorage = (event: StorageEvent) => {
     if (event.key !== THEME_STORAGE_KEY) return;
-    current = resolve(readStoredMode());
-    emit();
+    commit(resolve(readStoredMode()));
   };
 
   listeners.add(onStoreChange);
@@ -100,7 +118,7 @@ export function getThemeServerSnapshot(): Readonly<ThemeState> {
   return SERVER_SNAPSHOT;
 }
 
-/** Set the user's mode choice and persist it. */
+/** Set the user's mode choice, persist it, and apply it to the document. */
 export function setThemeMode(mode: ThemeMode): void {
   ensureInitialized();
   try {
@@ -112,6 +130,5 @@ export function setThemeMode(mode: ThemeMode): void {
   } catch {
     // Storage unavailable (private mode, etc.) — session-only theme.
   }
-  current = resolve(mode);
-  emit();
+  commit(resolve(mode));
 }

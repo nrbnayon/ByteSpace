@@ -90,6 +90,58 @@ describe("ThemeProvider", () => {
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBeNull();
   });
 
+  it("applies the dark class to <html> when dark is selected (visual switch)", async () => {
+    const user = userEvent.setup();
+    const { unmount } = renderWithProvider(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>
+    );
+    const html = document.documentElement;
+
+    await user.click(screen.getByRole("radio", { name: "Dark theme" }));
+    expect(html.classList.contains("dark")).toBe(true);
+    expect(html.style.colorScheme).toBe("dark");
+
+    await user.click(screen.getByRole("radio", { name: "Light theme" }));
+    expect(html.classList.contains("dark")).toBe(false);
+    expect(html.style.colorScheme).toBe("light");
+
+    unmount();
+    // Leave the environment clean for other tests.
+    html.classList.remove("dark");
+    html.style.colorScheme = "";
+  });
+
+  it("removes the dark class when switching from stored dark to system-light", async () => {
+    localStorage.setItem(THEME_STORAGE_KEY, "dark");
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    const user = userEvent.setup();
+    renderWithProvider(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>
+    );
+    const html = document.documentElement;
+
+    await vi.waitFor(() => {
+      expect(html.classList.contains("dark")).toBe(true);
+    });
+
+    await user.click(screen.getByRole("radio", { name: "System theme" }));
+    expect(html.classList.contains("dark")).toBe(false);
+
+    // Clean up.
+    localStorage.removeItem(THEME_STORAGE_KEY);
+    html.classList.remove("dark");
+    html.style.colorScheme = "";
+  });
+
   it("toggle group is a labelled radiogroup with no a11y violations", async () => {
     const { container } = renderWithProvider(<ThemeToggle />);
     await vi.waitFor(() => {

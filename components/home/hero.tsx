@@ -34,10 +34,6 @@ const gridStyle: CSSProperties = {
   backgroundPosition: "calc(50% + var(--g) / 2) var(--g)",
 };
 
-// Drop-shadow for the student cutout (from Figma). Remove if your PNG already has it baked in.
-const studentShadow =
-  "[filter:drop-shadow(5px_8px_9.6px_rgba(0,0,0,.07))_drop-shadow(25px_37px_36px_rgba(0,0,0,.08))]";
-
 // Figma recolours the grey 3D renders with a #f5f5f6 hard-light mask:
 // out = 0.92 + 0.08 * base  →  same result with one CSS filter.
 const whiten = "[filter:contrast(.04)_brightness(1.92)]";
@@ -95,15 +91,18 @@ const ORNAMENTS = [
   },
 ];
 
+// [offsetX, offsetY, blur, opacity]  – opacities converted from Figma hex:
+// 0x0A/255≈0.039, 0x0F/255≈0.059, 0x12/255≈0.071, 0x14/255≈0.078
+// 0x17/255≈0.090, 0x1A/255≈0.102, 0x1B/255≈0.106, 0x21/255≈0.129
 const STUDENT_SHADOWS: [number, number, number, number][] = [
-  [0.52, 0.74, 3.04, 0.039],
-  [2.23, 3.19, 5.72, 0.059],
-  [5.38, 7.69, 9.57, 0.071],
-  [10.21, 14.58, 16.09, 0.078],
-  [16.95, 24.21, 24, 0.09],
-  [25.84, 36.91, 36, 0.102],
-  [37.12, 53.03, 56, 0.106],
-  [51.04, 72.91, 72, 0.129],
+  [0.52,  0.74,  3.04, 10 / 255],
+  [2.23,  3.19,  5.72, 15 / 255],
+  [5.38,  7.69,  9.57, 18 / 255],
+  [10.21, 14.58, 16.09, 20 / 255],
+  [16.95, 24.21, 24,   23 / 255],
+  [25.84, 36.91, 36,   26 / 255],
+  [37.12, 53.03, 56,   27 / 255],
+  [51.04, 72.91, 72,   33 / 255],
 ];
 
 const card =
@@ -414,25 +413,33 @@ export function Hero() {
             data-depth="0.25"
             className="absolute inset-x-0 bottom-0 z-10 mx-auto w-[min(92vw,400px)] sm:w-[480px] lg:inset-x-auto lg:bottom-auto lg:left-[431px] lg:top-[512px] lg:mx-0 lg:w-[578px]"
           >
-            {/* 8-layer Figma shadow that follows the cutout's silhouette */}
+            {/* 8-layer Figma drop-shadow that follows the PNG silhouette.
+                 The filter region must be large enough to contain the outermost
+                 shadow (dx≈51, dy≈73, blur≈72 at a 578px element) so nothing
+                 is clipped. x/y=-50% and width/height=220%/250% gives ample room. */}
             <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">
               <defs>
                 <filter
                   id="student-shadow"
-                  x="-25%"
-                  y="-25%"
-                  width="160%"
-                  height="190%"
+                  x="-50%"
+                  y="-50%"
+                  width="220%"
+                  height="250%"
                   colorInterpolationFilters="sRGB"
                 >
                   {STUDENT_SHADOWS.map(([dx, dy, blur, alpha], i) => (
                     <g key={i}>
+                      {/* blur the alpha channel of the source image */}
                       <feGaussianBlur in="SourceAlpha" stdDeviation={blur / 2} result={`b${i}`} />
+                      {/* shift the blurred shadow */}
                       <feOffset in={`b${i}`} dx={dx} dy={dy} result={`o${i}`} />
-                      <feFlood floodColor="#000" floodOpacity={alpha} result={`f${i}`} />
+                      {/* fill with black at the correct opacity */}
+                      <feFlood floodColor="#000000" floodOpacity={alpha} result={`f${i}`} />
+                      {/* mask the flood to the shadow silhouette */}
                       <feComposite in={`f${i}`} in2={`o${i}`} operator="in" result={`s${i}`} />
                     </g>
                   ))}
+                  {/* stack all shadow layers, then paint the original image on top */}
                   <feMerge>
                     {STUDENT_SHADOWS.map((_, i) => (
                       <feMergeNode key={i} in={`s${i}`} />
