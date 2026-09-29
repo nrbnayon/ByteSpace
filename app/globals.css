@@ -259,3 +259,19 @@
     animation: none;
   }
 }
+
+/* ─── Auth pages ─────────────────────────────────────────────────────────
+   Blue canvas with the faint white grid from the sign-up design. */
+.auth-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 9%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 9%) 1px, transparent 1px);
+  background-size: 120px 120px;
+  background-position: -1px -1px;
+}
+
+@media (max-width: 1023px) {
+  .auth-grid {
+    background-size: 64px 64px;
+  }
+}
