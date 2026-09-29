@@ -14,13 +14,6 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 const poppins = "font-[family-name:var(--font-poppins)]";
 const satoshi = "font-[family-name:var(--font-satoshi)]";
 
-/**
- * Design canvas = 1440 × 1024 (Figma).
- *  --s    scale that fits the canvas in BOTH width and height of the screen
- *  --cw   real container width (px) – set precisely by JS (CSS fallback = 100vw)
- *  --edge canvas-x of the real screen edge, used to pin the two lime shapes
- *         flush to the left / right edge of the screen at any viewport size
- */
 const rootStyle = {
   "--s": "min(1, tan(atan2(100vw, 1440px)), tan(atan2(100svh, 1024px)))",
   "--cw": "100vw",
@@ -95,14 +88,14 @@ const ORNAMENTS = [
 // 0x0A/255≈0.039, 0x0F/255≈0.059, 0x12/255≈0.071, 0x14/255≈0.078
 // 0x17/255≈0.090, 0x1A/255≈0.102, 0x1B/255≈0.106, 0x21/255≈0.129
 const STUDENT_SHADOWS: [number, number, number, number][] = [
-  [0.52,  0.74,  3.04, 10 / 255],
-  [2.23,  3.19,  5.72, 15 / 255],
-  [5.38,  7.69,  9.57, 18 / 255],
+  [0.52, 0.74, 3.04, 10 / 255],
+  [2.23, 3.19, 5.72, 15 / 255],
+  [5.38, 7.69, 9.57, 18 / 255],
   [10.21, 14.58, 16.09, 20 / 255],
-  [16.95, 24.21, 24,   23 / 255],
-  [25.84, 36.91, 36,   26 / 255],
-  [37.12, 53.03, 56,   27 / 255],
-  [51.04, 72.91, 72,   33 / 255],
+  [16.95, 24.21, 24, 23 / 255],
+  [25.84, 36.91, 36, 26 / 255],
+  [37.12, 53.03, 56, 27 / 255],
+  [51.04, 72.91, 72, 33 / 255],
 ];
 
 const card =
@@ -356,23 +349,23 @@ export function Hero() {
             className="absolute z-0 aspect-square w-[170%] rounded-full bg-[#ccff00] opacity-0 left-[-35%] top-[34%] sm:left-[-25%] sm:top-[30%] sm:w-[150%] lg:left-[145px] lg:top-[582px] lg:w-[1149px]"
           /> */}
 
-         {/* Lime arc: 1149px wide, centred, flush with the bottom of the hero */}
-        <div
-          data-anim
-          data-hero="circle"
-          aria-hidden="true"
-          className="absolute bottom-0 z-0 w-[170%] opacity-0 left-[-35%] sm:left-[-25%] sm:w-[150%] lg:left-[145px] lg:w-[1149px]"
-        >
-          <Image
-            src="/images/hero/cbcolor-bg.svg"
-            alt=""
-            width={1149}
-            height={442}
-            priority
-            sizes="(min-width: 1024px) 1149px, 170vw"
-            className="block h-auto w-full"
-          />
-        </div>
+          {/* Lime arc: 1149px wide, centred, flush with the bottom of the hero */}
+          <div
+            data-anim
+            data-hero="circle"
+            aria-hidden="true"
+            className="absolute bottom-0 z-0 w-[170%] opacity-0 left-[-35%] sm:left-[-25%] sm:w-[150%] lg:left-[145px] lg:w-[1149px]"
+          >
+            <Image
+              src="/images/hero/cbcolor-bg.svg"
+              alt=""
+              width={1149}
+              height={442}
+              priority
+              sizes="(min-width: 1024px) 1149px, 170vw"
+              className="block h-auto w-full"
+            />
+          </div>
 
           {/* 3D ornaments
               layers: outer (position, scroll, generic mouse parallax)

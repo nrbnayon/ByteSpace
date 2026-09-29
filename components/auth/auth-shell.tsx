@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { AuthForm } from "@/components/auth/auth-form";
 import { Logo } from "@/components/brand/logo";
-import { AvatarStack } from "@/components/ui/avatar-stack";
 import { heroStudentAvatars } from "@/data/stats";
 
 gsap.registerPlugin(useGSAP);
@@ -18,174 +18,319 @@ type AuthShellProps = {
   mode: AuthMode;
 };
 
+const satoshi = "font-[family-name:var(--font-satoshi)]";
+
+/**
+ * Design canvas = 1440 × 1024 (Figma), same technique as the Hero.
+ * From `lg` up every element uses its exact Figma coordinate and the whole
+ * canvas is scaled to fit the screen (--s). Below `lg` it is a simple
+ * centred form.
+ */
+const rootStyle = {
+  "--s": "min(1, tan(atan2(100vw, 1440px)), tan(atan2(100svh, 1024px)))",
+} as CSSProperties;
+
+// 120px grid, aligned to the centred canvas (lines at canvas x = 120·k, y = 120·k)
+const gridStyle: CSSProperties = {
+  backgroundImage:
+    "linear-gradient(to right, rgba(255,255,255,.1) 2px, transparent 2px), linear-gradient(to bottom, rgba(255,255,255,.1) 2px, transparent 2px)",
+  backgroundSize: "var(--g) var(--g)",
+  backgroundPosition:
+    "calc(50% + var(--g) / 2) calc(50% + var(--g) / 2 - 32px * var(--s))",
+};
+
 export function AuthShell({ mode }: AuthShellProps) {
   const isSignUp = mode === "sign-up";
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Entrance animations for the collage + form (skipped for reduced motion).
+  // Exact fit-to-screen scale before first paint
+  useLayoutEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const s = Math.min(1, el.clientWidth / 1440, window.innerHeight / 1024);
+      el.style.setProperty("--s", String(s));
+    };
+    update();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
+    ro?.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      const root = rootRef.current;
+      if (!root) return;
+      const mm = gsap.matchMedia(root);
 
+      // Reduced motion: show everything
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set("[data-anim]", { opacity: 1, y: 0, x: 0, scale: 1 });
+        gsap.set("[data-anim]", { opacity: 1 });
       });
 
+      // Entrance + idle float
       mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const startFloat = () => {
+          gsap.utils.toArray<HTMLElement>("[data-float]", root).forEach((el, i) => {
+            const dir = i % 2 ? -1 : 1;
+            gsap.to(el, {
+              y: dir * gsap.utils.random(8, 14),
+              ...(el.hasAttribute("data-spin")
+                ? { rotate: -dir * gsap.utils.random(2, 4) }
+                : {}),
+              duration: gsap.utils.random(3, 4.6),
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+            });
+          });
+        };
+
         gsap
           .timeline({ defaults: { ease: "power3.out" } })
           .fromTo("[data-anim='logo']", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.6 }, 0)
-          .fromTo("[data-anim='intro']", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, 0.1)
-          .fromTo("[data-anim='card-back']", { opacity: 0, x: -60, rotate: -5 }, { opacity: 1, x: 0, rotate: 0, duration: 0.9 }, 0.25)
+          .fromTo("[data-anim='intro']", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.1 }, 0.1)
+          .fromTo("[data-anim='form']", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9 }, 0.3)
+          .fromTo("[data-anim='field']", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.08 }, 0.7)
+          .fromTo("[data-anim='card-back']", { opacity: 0, x: -60, rotate: -4 }, { opacity: 1, x: 0, rotate: 0, duration: 0.9 }, 0.25)
           .fromTo("[data-anim='card-front']", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.9 }, 0.4)
-          .fromTo("[data-anim='donut']", { opacity: 0, scale: 0.4, rotate: -60 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.8, ease: "back.out(1.7)" }, 0.55)
-          .fromTo("[data-anim='coil']", { opacity: 0, scale: 0.5, rotate: -30 }, { opacity: 1, scale: 1, rotate: 8, duration: 0.8, ease: "back.out(1.6)" }, 0.65)
-          .fromTo("[data-anim='triangle']", { opacity: 0, y: 40, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.5)" }, 0.75)
+          .fromTo("[data-anim='donut']", { opacity: 0, scale: 0.4, rotate: -60 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.8, ease: "back.out(1.7)" }, 0.7)
+          .fromTo("[data-anim='triangle']", { opacity: 0, y: 40, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.5)" }, 0.8)
           .fromTo("[data-anim='students']", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8 }, 0.85)
-          .fromTo("[data-anim='form']", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, 0.3);
-
-        // Idle float on the decorative pieces.
-        gsap.to("[data-float='1']", { y: 10, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: -1 });
-        gsap.to("[data-float='2']", { y: -9, duration: 3.8, ease: "sine.inOut", yoyo: true, repeat: -1 });
+          .fromTo("[data-anim='coil']", { opacity: 0, scale: 0.5, rotate: -30 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.8, ease: "back.out(1.6)" }, 0.95)
+          .add(startFloat);
       });
+
+      // Gentle mouse parallax on the collage (desktop pointer devices only)
+      mm.add(
+        "(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (hover: hover)",
+        () => {
+          const layers = gsap.utils.toArray<HTMLElement>("[data-depth]", root).map((el) => ({
+            d: Number(el.dataset.depth),
+            x: gsap.quickTo(el, "x", { duration: 0.9, ease: "power3" }),
+            y: gsap.quickTo(el, "y", { duration: 0.9, ease: "power3" }),
+          }));
+          const onMove = (e: PointerEvent) => {
+            const r = root.getBoundingClientRect();
+            const nx = (e.clientX - r.left) / r.width - 0.5;
+            const ny = (e.clientY - r.top) / r.height - 0.5;
+            layers.forEach((l) => {
+              l.x(-nx * l.d * 30);
+              l.y(-ny * l.d * 30);
+            });
+          };
+          const onLeave = () => layers.forEach((l) => { l.x(0); l.y(0); });
+          root.addEventListener("pointermove", onMove);
+          root.addEventListener("pointerleave", onLeave);
+          return () => {
+            root.removeEventListener("pointermove", onMove);
+            root.removeEventListener("pointerleave", onLeave);
+          };
+        },
+      );
 
       return () => mm.revert();
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   return (
-    <div ref={rootRef} className="auth-grid min-h-screen bg-[#003BE2] text-white">
-      <div className="mx-auto grid min-h-screen w-full max-w-[1600px] lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-14 lg:px-12 xl:gap-20 xl:px-20">
-        <section className="hidden min-h-screen flex-col px-8 pb-12 pt-7 lg:flex xl:px-0" aria-labelledby="auth-intro-title">
-          <div data-anim="logo">
-            <Link href="/" aria-label="ByteSpace home" className="w-fit rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+    <div
+      ref={rootRef}
+      style={rootStyle}
+      className={`${satoshi} relative isolate min-h-svh w-full overflow-hidden bg-[#003be2] text-white lg:h-svh`}
+    >
+      {/* Grid (120px cells on desktop, 64px on mobile) */}
+      <div
+        aria-hidden="true"
+        style={gridStyle}
+        className="pointer-events-none absolute inset-0 -z-10 [--g:64px] lg:[--g:calc(120px*var(--s))]"
+      />
+
+      {/* Canvas: simple centred form below lg, 1440×1024 scaled-to-fit from lg */}
+      <div className="relative flex min-h-svh w-full flex-col items-center justify-center px-5 py-24 sm:px-8 lg:absolute lg:left-1/2 lg:top-1/2 lg:block lg:h-[1024px] lg:min-h-0 lg:w-[1440px] lg:p-0 lg:[translate:-50%_-50%] lg:[scale:var(--s)]">
+        {/* Logo mark (x122 y35) */}
+        <div className="absolute left-5 top-6 z-20 lg:left-[122px] lg:top-[35px]">
+          <div data-anim="logo" className="opacity-0">
+            <Link
+              href="/"
+              aria-label="ByteSpace home"
+              className="inline-flex w-fit rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d4fb20]"
+            >
               <Logo withWordmark={false} className="text-secondary" />
             </Link>
           </div>
-          <div data-anim="intro" className="mt-9 max-w-md opacity-0">
-            <h2 id="auth-intro-title" className="text-xl font-semibold text-white">
-              {isSignUp ? "Sign up and come in" : "Sign in with ease"}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-white/80">
-              {isSignUp
-                ? "The registration process is straightforward, uncomplicated, and efficient, allowing users to sign up quickly, easily, and at no cost."
-                : "Experience a seamless and efficient sign-in process that grants you instant access to a world of knowledge."}
-            </p>
-          </div>
-          <AuthCollage />
+        </div>
+
+        {/* Intro text (x122 y120, 480px wide) */}
+        <section
+          aria-labelledby="auth-intro-title"
+          className="hidden lg:absolute lg:left-[122px] lg:top-[120px] lg:z-10 lg:block lg:w-[480px]"
+        >
+          <h2
+            id="auth-intro-title"
+            data-anim="intro"
+            className="text-xl font-bold leading-[1.2] text-white opacity-0"
+          >
+            {isSignUp ? "Sign up and come in" : "Sign in with ease"}
+          </h2>
+          <p
+            data-anim="intro"
+            className="mt-4 text-lg leading-[1.6] text-[#e5e6e8] opacity-0"
+          >
+            {isSignUp
+              ? "The registration process is straightforward, uncomplicated, and efficient, allowing users to sign up quickly, easily, and at no cost"
+              : "Experience a seamless and efficient sign-in process that grants you instant access to a world of knowledge."}
+          </p>
         </section>
 
-        <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-0" aria-label={isSignUp ? "Create your ByteSpace account" : "Sign in to ByteSpace"}>
-          <div data-anim="form" className="w-full max-w-[560px] rounded-[1.5rem] bg-card px-7 py-10 text-foreground opacity-0 shadow-2xl shadow-black/10 sm:px-12 sm:py-12 lg:px-12 xl:px-16">
-            <AuthForm mode={mode} />
-          </div>
-        </section>
+        {/* Collage (desktop only, children use canvas coordinates) */}
+        <AuthCollage />
+
+        {/* Form card (x741 y120, 579 × 784) */}
+        <div
+          data-anim="form"
+          className="relative w-full max-w-[579px] rounded-[32px] bg-white p-6 text-[#242528] opacity-0 sm:p-10 lg:absolute lg:left-[741px] lg:top-[120px] lg:h-[784px] lg:w-[579px] lg:max-w-none lg:p-16"
+          aria-label={isSignUp ? "Create your ByteSpace account" : "Sign in to ByteSpace"}
+        >
+          <AuthForm mode={mode} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Positioned wrapper (parallax) → inner element (entrance + idle float). */
+function Piece({
+  depth,
+  className,
+  anim,
+  float = true,
+  spin = false,
+  children,
+}: {
+  depth: number;
+  className: string;
+  anim: string;
+  float?: boolean;
+  spin?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div data-depth={depth} className={`absolute ${className}`}>
+      <div
+        data-anim={anim}
+        {...(float ? { "data-float": "" } : {})}
+        {...(spin ? { "data-spin": "" } : {})}
+        className="opacity-0"
+      >
+        {children}
       </div>
     </div>
   );
 }
 
 /**
- * Left-panel collage, layered exactly like the Figma reference:
- * the two finished course-card artworks overlap diagonally, the lime donut
- * sits behind the front card's top-left corner, the white coil hugs the
- * front card's right edge, and the lime cone + Happy Students float anchor
- * the bottom.
+ * Left collage – exact Figma coordinates (canvas 1440 × 1024).
+ * Stacking (low → high): back card, front card, Happy Students, triangle,
+ * donut, coil.
  */
 function AuthCollage() {
   return (
-    <div className="relative mt-auto aspect-[683/683] w-full max-w-[600px] self-center">
-      {/* Lime donut — peeks out behind the cards' junction, like the design */}
-      <Image
-        src="/images/auth/yellow-circle.svg"
-        alt=""
-        aria-hidden="true"
-        data-anim="donut"
-        data-float="2"
-        width={580}
-        height={580}
-        className="absolute left-[13%] top-[2%] z-0 w-[32%] opacity-0"
-      />
-
-      {/* Back card — "Build Digital Asset" (finished artwork) */}
-      <div
-        data-anim="card-back"
-        className="absolute left-0 top-[10%] z-10 w-[47%] overflow-hidden rounded-2xl shadow-2xl shadow-black/25 sm:w-[44%]"
-      >
+    <div className="hidden lg:contents">
+      {/* Back card – "Build Digital Asset" (373 × 384 at x122 y394) */}
+      <Piece depth={0.3} anim="card-back" float={false} className="left-[122px] top-[394px] z-[1] w-[373px]">
         <Image
           src="/images/auth/auth-left-bg-card-2.png"
-          alt="Build Digital Asset course card — beginner level, 26+ students, $25 lifetime"
+          alt="Build Digital Asset course card, beginner level, $25 lifetime"
           width={373}
           height={384}
-          sizes="(min-width: 1024px) 280px, 45vw"
-          className="h-auto w-full"
+          sizes="373px"
+          className="h-auto w-full select-none"
         />
-      </div>
+      </Piece>
 
-      {/* Front card — "the Power of Big Data" (finished artwork) */}
-      <div
-        data-anim="card-front"
-        data-float="1"
-        className="absolute left-[30%] top-0 z-20 w-[58%] overflow-hidden rounded-2xl shadow-2xl shadow-black/30 sm:w-[54%]"
-      >
+      {/* Front card – "the Power of Big Data" (373 × 384 at x233 y305) */}
+      <Piece depth={0.45} anim="card-front" className="left-[233px] top-[305px] z-[2] w-[373px]">
         <Image
           src="/images/auth/auth-left-bg-card-1.png"
-          alt="The Power of Big Data course card — beginner level, 4.5 rating, 26+ students, $25 lifetime"
+          alt="The Power of Big Data course card, beginner level, 4.5 rating, $25 lifetime"
           width={373}
           height={384}
-          sizes="(min-width: 1024px) 330px, 55vw"
-          className="h-auto w-full"
+          sizes="373px"
           priority
+          className="h-auto w-full select-none"
         />
-      </div>
+      </Piece>
 
-      {/* White coil — hugging the front card's right edge */}
-      <Image
-        src="/images/auth/white-coil-big.svg"
-        alt=""
-        aria-hidden="true"
-        data-anim="coil"
-        data-float="2"
-        width={660}
-        height={660}
-        className="absolute right-[2%] top-[38%] z-10 w-[24%] opacity-0"
-      />
+      {/* Lime "Happy Students" card (257 × 122 at x348 y740) */}
+      <Piece depth={0.6} anim="students" className="left-[348px] top-[740px] z-[3] w-[257px]">
+        <div className="flex w-[257px] select-none flex-col justify-center gap-2 rounded-2xl bg-[#d4fb20] p-4 text-[#242528]">
+          <div className="flex flex-col">
+            <p className="text-base font-medium leading-[1.2]">Happy Students</p>
+            <p className="flex items-center text-xs leading-[1.6]">
+              <span className="font-bold">4.5&nbsp;</span>
+              <span className="text-[#242528]/55">(240)</span>
+              <Star className="size-4 fill-[#003be2] text-[#003be2]" aria-hidden="true" />
+            </p>
+          </div>
+          <div className="flex" role="img" aria-label="Over 2,000 happy students">
+            {heroStudentAvatars.slice(0, 7).map((src) => (
+              <Image
+                key={src}
+                src={src}
+                alt=""
+                width={86}
+                height={86}
+                className="-mr-4 size-[43px] shrink-0 rounded-full object-cover"
+              />
+            ))}
+            <span className="grid size-[43px] shrink-0 place-items-center rounded-full bg-[#242528] text-xs font-bold leading-[1.5] text-white">
+              2K+
+            </span>
+          </div>
+        </div>
+      </Piece>
 
-      {/* Lime cone — bottom-left */}
-      <Image
-        src="/images/auth/yellow-triangle.svg"
-        alt=""
-        aria-hidden="true"
-        data-anim="triangle"
-        data-float="1"
-        width={580}
-        height={580}
-        className="absolute bottom-[0%] left-[8%] z-10 w-[26%] opacity-0"
-      />
-
-      {/* Happy Students lime float — bottom-right, overlapping the cards */}
-      <div
-        data-anim="students"
-        data-float="2"
-        className="absolute bottom-[4%] left-[36%] z-30 w-[52%] max-w-[300px] rounded-2xl bg-secondary p-4 text-secondary-foreground opacity-0 shadow-xl sm:p-5"
-      >
-        <p className="text-base font-medium sm:text-lg">Happy Students</p>
-        <p className="mt-0.5 flex items-center gap-1 text-xs sm:text-sm">
-          <span className="font-semibold">4.5</span>
-          <span className="text-secondary-foreground/60 line-through">(240)</span>
-          <svg viewBox="0 0 24 24" className="size-4 fill-[#003BE2]" aria-hidden="true">
-            <path d="M12 2l2.9 6.26 6.87.8-5.09 4.62 1.36 6.77L12 16.9l-6.04 3.55 1.36-6.77L2.23 9.06l6.87-.8L12 2z" />
-          </svg>
-        </p>
-        <AvatarStack
-          label="Happy students"
-          images={heroStudentAvatars.slice(0, 6).map((src) => ({ src, width: 86, height: 86 }))}
-          extraLabel="2K+"
-          size={28}
-          className="mt-3"
+      {/* Lime triangle (≈126 × 137 at x122 y724) */}
+      <Piece depth={0.9} anim="triangle" spin className="left-[122px] top-[724px] z-[4] w-[126px]">
+        <Image
+          src="/images/auth/yellow-triangle.svg"
+          alt=""
+          aria-hidden="true"
+          width={126}
+          height={137}
+          className="pointer-events-none h-auto w-full select-none"
         />
-      </div>
+      </Piece>
+
+      {/* Lime donut (≈101 × 94 at x172 y345) – sits ON TOP of both cards */}
+      <Piece depth={1} anim="donut" spin className="left-[172px] top-[345px] z-[5] w-[101px]">
+        <Image
+          src="/images/auth/yellow-circle.svg"
+          alt=""
+          aria-hidden="true"
+          width={101}
+          height={94}
+          className="pointer-events-none h-auto w-full select-none"
+        />
+      </Piece>
+
+      {/* White coil (≈116 × 122 at x502 y655) – top-most */}
+      <Piece depth={1} anim="coil" spin className="left-[502px] top-[655px] z-[6] w-[116px]">
+        <Image
+          src="/images/auth/white-coil-big.svg"
+          alt=""
+          aria-hidden="true"
+          width={116}
+          height={122}
+          className="pointer-events-none h-auto w-full select-none"
+        />
+      </Piece>
     </div>
   );
 }
