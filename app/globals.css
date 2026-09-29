@@ -21,6 +21,7 @@
   --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-poppins), var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
   --font-brand: var(--font-clash-display), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-clash: var(--font-clash-display), ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
