@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <section className="not-found-grid relative isolate flex min-h-[510px] items-center justify-center overflow-hidden bg-primary px-5 pb-16 pt-28 text-primary-foreground sm:min-h-[560px] sm:px-8">
+    <section className="not-found-grid relative isolate flex min-h-[510px] items-center justify-center overflow-hidden bg-primary px-5 pb-16 pt-28 text-primary-foreground sm:min-h-screen sm:px-8">
       <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center text-center">
         <p
           aria-hidden="true"

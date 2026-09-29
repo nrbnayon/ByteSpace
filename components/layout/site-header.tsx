@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { mainNav, siteConfig } from "@/config/site";
+import { MdOutlineShoppingBag } from "react-icons/md";
+
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
@@ -42,18 +44,18 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-5 lg:flex">
           <ThemeToggle variant="brand" />
-          <Button variant="ghost" className="text-surface-brand-foreground hover:bg-surface-brand-foreground/10 hover:text-surface-brand-foreground">
-            Sign In
+          <Button asChild variant="ghost" className="text-surface-brand-foreground hover:bg-surface-brand-foreground/10 hover:text-surface-brand-foreground">
+            <Link href="/sign-in">Sign In</Link>
           </Button>
-          <Button variant="secondary" size="sm">
-            Join Us
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/sign-up">Join Us</Link>
           </Button>
           <button
             type="button"
             aria-label="Open cart"
             className="inline-flex size-10 items-center justify-center rounded-full text-surface-brand-foreground transition-colors hover:bg-surface-brand-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
-            <ShoppingCart className="size-5" aria-hidden="true" />
+            <MdOutlineShoppingBag className="size-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -98,11 +100,15 @@ export function SiteHeader() {
           </ul>
         </nav>
         <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-          <Button variant="outline" className="flex-1">
-            Sign In
+          <Button asChild variant="outline" className="flex-1 cursor-pointer">
+            <Link href="/sign-in" onClick={() => setOpen(false)}>
+              Sign In
+            </Link>
           </Button>
-          <Button variant="secondary" className="flex-1">
-            Join Us
+          <Button asChild variant="secondary" className="flex-1 cursor-pointer">
+            <Link href="/sign-up" onClick={() => setOpen(false)}>
+              Join Us
+            </Link>
           </Button>
         </div>
       </div>
