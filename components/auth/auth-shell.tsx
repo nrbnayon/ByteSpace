@@ -96,7 +96,7 @@ export function AuthShell({ mode }: AuthShellProps) {
 function AuthCollage() {
   return (
     <div className="relative mt-auto aspect-[683/683] w-full max-w-[600px] self-center">
-      {/* Lime donut — behind both cards, top-left */}
+      {/* Lime donut — peeks out behind the cards' junction, like the design */}
       <Image
         src="/images/auth/yellow-circle.svg"
         alt=""
@@ -105,7 +105,7 @@ function AuthCollage() {
         data-float="2"
         width={580}
         height={580}
-        className="absolute left-[2%] top-[4%] z-0 w-[34%] opacity-0"
+        className="absolute left-[13%] top-[2%] z-0 w-[32%] opacity-0"
       />
 
       {/* Back card — "Build Digital Asset" (finished artwork) */}
