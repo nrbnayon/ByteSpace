@@ -11,7 +11,7 @@ type AuthFormProps = {
 };
 
 const fieldClassName =
-  "h-11 w-full rounded-lg border border-border bg-background px-4 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring/50";
+  "h-13 w-full rounded-xl border border-input bg-background px-5 text-base text-foreground outline-none transition-shadow placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40";
 
 export function AuthForm({ mode }: AuthFormProps) {
   const isSignUp = mode === "sign-up";
@@ -65,7 +65,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <Button type="submit" variant="secondary" size="md" className="ml-auto w-fit px-7">
           {isSignUp ? "Continue" : "Sign In"}
         </Button>
-        <p aria-live="polite" className="min-h-5 text-sm text-muted-foreground">
+        <p aria-live="polite" role="status" className="min-h-5 text-sm text-muted-foreground">
           {submitted ? "This demo form is ready to connect to your auth service." : ""}
         </p>
       </form>
