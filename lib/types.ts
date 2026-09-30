@@ -39,7 +39,8 @@ export type Testimonial = {
   name: string;
   role: string;
   quote: string;
-  rating: number;
+  /** Optional — the redesigned testimonial cards drop star ratings. */
+  rating?: number;
   avatar: {
     src: string;
     width: number;

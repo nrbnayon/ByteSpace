@@ -16,36 +16,28 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 /**
  * Radial glow palette from the Figma spec (node 22-321), kept as CSS
  * gradients — resolution-independent, themeable via CSS vars, and cheaper
- * than shipping raster/SVG glow files. Order = paint order.
+ * than shipping raster/SVG glow files.
  *
- * Geometry was pixel-probed from the original design render so the five
- * glows sit exactly where Figma placed them (peak alpha values are the
- * effective ones measured on the #FAFAFA ground, not the raw node values).
+ * Geometry was pixel-probed from the original design render: each entry is
+ * `radial-gradient(<rx> <ry> at <cx> <cy>, …)` with radii/center as % of the
+ * section box, so glows can center off-canvas and bleed past the edges.
+ * They all paint on ONE layer (joined in `style.background`) — per-element
+ * backdrop-filter ellipses produced a visible seam arc where they crossed
+ * the section's overflow clip, which this single-layer approach removes.
  */
 const GLOW_LAYERS = [
-  // Lime bloom, top-left — the section's dominant glow, clipped by the top edge
-  "radial-gradient(50% 50% at 50% 50%, rgba(203, 252, 1, 0.4) 0%, rgba(203, 252, 1, 0.092) 53%, rgba(203, 252, 1, 0.024) 75%, rgba(203, 252, 1, 0) 100%)",
-  // Blue wash, mid-left edge (center off-canvas)
-  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.16) 0%, rgba(0, 59, 226, 0.0368) 53%, rgba(0, 59, 226, 0.0096) 75%, rgba(0, 59, 226, 0) 100%)",
+  // Lime core, bottom-left — small & intense; FIRST layer paints on TOP so
+  // the blue washes beneath can't muddy it (matches the original's paint
+  // order), with a raised peak to compensate for the shared 40px blur
+  "radial-gradient(18% 18% at 2.5% 88.5%, rgba(203, 252, 1, 0.82) 0%, rgba(203, 252, 1, 0.188) 53%, rgba(203, 252, 1, 0.049) 75%, rgba(203, 252, 1, 0) 100%)",
+  // Blue wash, bottom-right corner — strongest blue, hugging the corner
+  "radial-gradient(42% 42.5% at 96% 106.5%, rgba(0, 59, 226, 0.24) 0%, rgba(0, 59, 226, 0.0552) 53%, rgba(0, 59, 226, 0.0144) 75%, rgba(0, 59, 226, 0) 100%)",
   // Blue wash, top-right edge (center off-canvas)
-  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.08) 0%, rgba(0, 59, 226, 0.0184) 53%, rgba(0, 59, 226, 0.0048) 75%, rgba(0, 59, 226, 0) 100%)",
-  // Blue wash, bottom-right corner — strongest blue, hugging the edge
-  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.24) 0%, rgba(0, 59, 226, 0.0552) 53%, rgba(0, 59, 226, 0.0144) 75%, rgba(0, 59, 226, 0) 100%)",
-  // Lime core, bottom-left — small & intense (r=336 node @ 0.6)
-  "radial-gradient(50% 50% at 50% 50%, rgba(203, 252, 1, 0.6) 0%, rgba(203, 252, 1, 0.138) 53%, rgba(203, 252, 1, 0.036) 75%, rgba(203, 252, 1, 0) 100%)",
-] as const;
-
-/**
- * Where each glow sits and how big it is (percent of the section box),
- * matching the probed Figma centers/edges — centers in the middle of the
- * box, half-extents = radii; negative offsets let glows bleed off-section.
- */
-const GLOW_BOXES = [
-  "left-[7%] top-[-42%] h-[88%] w-[43%]",
-  "left-[-35%] top-[18%] h-[60%] w-[60%]",
-  "right-[-28%] top-[-22%] h-[60%] w-[60%]",
-  "right-[-38%] bottom-[-49%] h-[85%] w-[84%]",
-  "left-[-18%] bottom-[-5%] h-[33%] w-[33%]",
+  "radial-gradient(30% 30% at 98% 8%, rgba(0, 59, 226, 0.08) 0%, rgba(0, 59, 226, 0.0184) 53%, rgba(0, 59, 226, 0.0048) 75%, rgba(0, 59, 226, 0) 100%)",
+  // Blue wash, mid-left edge (center off-canvas)
+  "radial-gradient(30% 30% at -5% 48%, rgba(0, 59, 226, 0.16) 0%, rgba(0, 59, 226, 0.0368) 53%, rgba(0, 59, 226, 0.0096) 75%, rgba(0, 59, 226, 0) 100%)",
+  // Lime bloom, top-left — the section's dominant glow, center just above the top edge
+  "radial-gradient(21.5% 44% at 28.5% 2%, rgba(203, 252, 1, 0.4) 0%, rgba(203, 252, 1, 0.092) 53%, rgba(203, 252, 1, 0.024) 75%, rgba(203, 252, 1, 0) 100%)",
 ] as const;
 
 export function ProfessionalGrowth() {
@@ -97,16 +89,21 @@ export function ProfessionalGrowth() {
       aria-labelledby="growth-title"
       className="relative isolate overflow-hidden bg-[#FAFAFA] py-20 lg:py-28 dark:bg-[#101322]"
     >
-      {/* Radial glow layers (decorative) */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        {GLOW_LAYERS.map((background, i) => (
-          <div
-            key={i}
-            data-glow
-            style={{ background, opacity: 0 }}
-            className={`absolute rounded-full blur-[60px] ${GLOW_BOXES[i]} dark:opacity-60`}
-          />
-        ))}
+      {/* Radial glow layer (decorative) — single painted layer, no element
+          seams; plain filter blur ≈ Figma's feGaussianBlur, avoiding the
+          backdrop-filter clip artifact. Layer bleeds 40px past the clip so
+          the blur samples gradient, not transparency, at the section edges.
+          Dark-mode dimming lives on the wrapper so GSAP's inline opacity on
+          the layer itself can never override it. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-10 -z-10 dark:opacity-60"
+      >
+        <div
+          data-glow
+          style={{ background: GLOW_LAYERS.join(", "), opacity: 0 }}
+          className="absolute inset-0 blur-[40px]"
+        />
       </div>
 
       <Container>

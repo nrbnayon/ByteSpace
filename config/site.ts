@@ -3,7 +3,7 @@ export const siteConfig = {
   tagline: "Get Access to Hundreds Courses Available",
   description:
     "Unlock your creativity, gain valuable knowledge, and grow your business with our wide range of courses.",
-  url: "https://bytespace.example.com",
+  url: "https://bytespace-bice.vercel.app",
   creator: {
     name: "purepearl studio",
   },
@@ -20,44 +20,37 @@ export const mainNav: readonly NavLink[] = [
   { label: "Creators", href: "/#creators" },
 ];
 
-export const footerNav: readonly { heading: string; links: readonly NavLink[] }[] = [
-  {
-    heading: "Featured Courses",
-    links: [
-      { label: "Digital Illustration", href: "/#courses" },
-      { label: "Animation", href: "/#courses" },
-      { label: "Business", href: "/#courses" },
-      { label: "UI/UX Design", href: "/#courses" },
-    ],
-  },
-  {
-    heading: "Development",
-    links: [
-      { label: "Web Development", href: "/#courses" },
-      { label: "Data Science", href: "/#courses" },
-      { label: "IT & Software", href: "/#courses" },
-      { label: "Photography", href: "/#courses" },
-    ],
-  },
-  {
-    heading: "Become a Creator",
-    links: [
-      { label: "Welcome, Creators", href: "/#creators" },
-      { label: "Course Creator Blog", href: "/#creators" },
-      { label: "Creator Help", href: "/#creators" },
-      { label: "Contact", href: "/#creators" },
-    ],
-  },
-  {
-    heading: "Company",
-    links: [
-      { label: "About Us", href: "/" },
-      { label: "Careers", href: "/" },
-      { label: "Blog", href: "/" },
-      { label: "Privacy Policy", href: "/" },
-    ],
-  },
-] as const;
+/** Footer link columns – exactly as in the design (3 columns × 5 links, no headings). */
+export const footerColumns: readonly (readonly NavLink[])[] = [
+  [
+    { label: "Featured Courses", href: "/#courses" },
+    { label: "Featured Categories", href: "/#courses" },
+    { label: "Business", href: "/#courses" },
+    { label: "IT", href: "/#courses" },
+    { label: "Design", href: "/#courses" },
+  ],
+  [
+    { label: "Development", href: "/#courses" },
+    { label: "Marketing", href: "/#courses" },
+    { label: "Photography", href: "/#courses" },
+    { label: "Finance", href: "/#courses" },
+    { label: "Sport", href: "/#courses" },
+  ],
+  [
+    { label: "Become a Creator", href: "/#creators" },
+    { label: "Affiliate Program", href: "/#creators" },
+    { label: "Contact", href: "/#creators" },
+    { label: "Help", href: "/#creators" },
+    { label: "About", href: "/" },
+  ],
+];
+
+/** Bottom-bar links (right side of the divider). */
+export const footerLegal: readonly NavLink[] = [
+  { label: "Privacy Policy", href: "/" },
+  { label: "Terms of Service", href: "/" },
+  { label: "Cookies Settings", href: "/" },
+];
 
 export const footerNote =
   "By subscribing, you agree to our Privacy Policy and consent to receive updates from our company.";
