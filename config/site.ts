@@ -37,19 +37,19 @@ export const footerColumns: readonly (readonly NavLink[])[] = [
     { label: "Sport", href: "/#courses" },
   ],
   [
-    { label: "Become a Creator", href: "/#creators" },
-    { label: "Affiliate Program", href: "/#creators" },
-    { label: "Contact", href: "/#creators" },
-    { label: "Help", href: "/#creators" },
+    { label: "Become a Creator", href: "/become-a-creator" },
+    { label: "Affiliate Program", href: "/become-a-creator" },
+    { label: "Contact", href: "/become-a-creator" },
+    { label: "Help", href: "/become-a-creator" },
     { label: "About", href: "/" },
   ],
 ];
 
 /** Bottom-bar links (right side of the divider). */
 export const footerLegal: readonly NavLink[] = [
-  { label: "Privacy Policy", href: "/" },
-  { label: "Terms of Service", href: "/" },
-  { label: "Cookies Settings", href: "/" },
+  { label: "Privacy Policy", href: "/legal/privacy-policy" },
+  { label: "Terms of Service", href: "/legal/terms-of-service" },
+  { label: "Cookies Settings", href: "/legal/cookies-settings" },
 ];
 
 export const footerNote =

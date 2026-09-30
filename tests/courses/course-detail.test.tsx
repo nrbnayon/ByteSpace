@@ -3,13 +3,22 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { CourseDetail } from "@/components/courses/course-detail";
+import { CartProvider } from "@/components/cart/cart-store";
 import { getCourseDetail } from "@/data/course-details";
 
 const course = getCourseDetail("build-digital-asset")!;
 
+function renderDetail() {
+  return render(
+    <CartProvider>
+      <CourseDetail course={course} />
+    </CartProvider>
+  );
+}
+
 describe("CourseDetail", () => {
   it("renders the hero with title, instructor, and summary pills", () => {
-    render(<CourseDetail course={course} />);
+    renderDetail();
     expect(
       screen.getByRole("heading", { level: 1, name: course.title })
     ).toBeInTheDocument();
@@ -22,7 +31,7 @@ describe("CourseDetail", () => {
   });
 
   it("renders the enroll card with lessons, price, CTA, and profile link", () => {
-    render(<CourseDetail course={course} />);
+    renderDetail();
     const aside = screen.getByRole("complementary", { name: "Enrollment options" });
     expect(
       within(aside).getByRole("heading", { name: /112 Lessons \(24 hours\)/i })
@@ -36,7 +45,7 @@ describe("CourseDetail", () => {
   });
 
   it("exposes an accessible tablist with panels wired by id", () => {
-    render(<CourseDetail course={course} />);
+    renderDetail();
     const tablist = screen.getByRole("tablist", { name: "Course information" });
     const tabs = within(tablist).getAllByRole("tab");
     expect(tabs.map((tab) => tab.textContent)).toEqual(["About", "Lessons", "Reviews"]);
@@ -49,7 +58,7 @@ describe("CourseDetail", () => {
 
   it("switches panels on click and supports arrow-key navigation", async () => {
     const user = userEvent.setup();
-    render(<CourseDetail course={course} />);
+    renderDetail();
     const tabs = screen.getAllByRole("tab");
 
     await user.click(tabs[2]!);
@@ -71,7 +80,7 @@ describe("CourseDetail", () => {
 
   it("filters individual reviews by star rating", async () => {
     const user = userEvent.setup();
-    render(<CourseDetail course={course} />);
+    renderDetail();
     await user.click(screen.getAllByRole("tab").at(-1)!);
 
     const group = screen.getByRole("group", { name: "Filter reviews by rating" });
@@ -83,7 +92,7 @@ describe("CourseDetail", () => {
   });
 
   it("shows related courses by the same creator", () => {
-    render(<CourseDetail course={course} />);
+    renderDetail();
     expect(
       screen.getByRole("heading", { name: /More by purepearl studio/i })
     ).toBeInTheDocument();
@@ -93,7 +102,7 @@ describe("CourseDetail", () => {
   });
 
   it("has no accessibility violations", async () => {
-    const { container } = render(<CourseDetail course={course} />);
+    const { container } = renderDetail();
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });

@@ -4,18 +4,76 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
 const CART_STORAGE_KEY = "bytespace-cart";
+const EMPTY: readonly string[] = Object.freeze([]);
+
+/** Module-level external store: localStorage + subscriber notification. */
+let snapshot: readonly string[] = EMPTY;
+let hydrated = false;
+const listeners = new Set<() => void>();
+
+/** Lazily read localStorage on the first client snapshot request. */
+function ensureHydrated() {
+  if (hydrated) return;
+  hydrated = true;
+  snapshot = readStorage();
+}
+
+function readStorage(): readonly string[] {
+  try {
+    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return EMPTY;
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return EMPTY;
+    return Object.freeze(parsed.filter((id): id is string => typeof id === "string"));
+  } catch {
+    return EMPTY;
+  }
+}
+
+function write(next: readonly string[]) {
+  snapshot = Object.freeze(next);
+  try {
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {
+    // Storage unavailable (private mode) — cart still works in-memory.
+  }
+  for (const listener of listeners) listener();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  // Keep tabs in sync — storage events fire in *other* tabs.
+  const onStorage = () => {
+    snapshot = readStorage();
+    for (const notify of listeners) notify();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function getSnapshot() {
+  ensureHydrated();
+  return snapshot;
+}
+
+/** During SSR/hydration the cart is always empty (server can't read storage). */
+function getServerSnapshot() {
+  return EMPTY;
+}
 
 type CartContextValue = {
   /** Course ids currently in the cart, in add order. */
   ids: readonly string[];
-  /** Count safe to render after mount (avoids SSR/localStorage mismatch). */
   count: number;
   has: (id: string) => boolean;
   add: (id: string) => void;
@@ -29,55 +87,30 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 /**
- * Cart state — course ids persisted to localStorage so the basket survives
- * reloads. Drawer open/close lives here too so the header button and the
- * Enroll CTA can both drive it.
+ * Cart state — course ids persisted to localStorage via an external store
+ * (useSyncExternalStore keeps SSR, hydration, and cross-tab tabs consistent
+ * without any setState-in-effect). Drawer open/close lives here too so the
+ * header button and the Enroll CTA can both drive it.
  */
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [ids, setIds] = useState<readonly string[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const ids = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
-  // Load once after mount.
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-      if (raw) {
-        const parsed: unknown = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setIds(parsed.filter((id): id is string => typeof id === "string"));
-        }
-      }
-    } catch {
-      // Corrupt storage — start clean.
-    }
-    setHydrated(true);
-  }, []);
-
-  // Persist on change (after hydration).
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(ids));
-    } catch {
-      // Storage unavailable (private mode) — cart still works in-memory.
-    }
-  }, [ids, hydrated]);
-
   const add = useCallback((id: string) => {
-    setIds((current) => (current.includes(id) ? current : [...current, id]));
+    if (snapshot.includes(id)) return;
+    write([...snapshot, id]);
   }, []);
 
   const remove = useCallback((id: string) => {
-    setIds((current) => current.filter((existing) => existing !== id));
+    write(snapshot.filter((existing) => existing !== id));
   }, []);
 
-  const clear = useCallback(() => setIds([]), []);
+  const clear = useCallback(() => write([]), []);
 
   const value = useMemo<CartContextValue>(
     () => ({
       ids,
-      count: hydrated ? ids.length : 0,
+      count: ids.length,
       has: (id) => ids.includes(id),
       add,
       remove,
@@ -86,7 +119,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       openDrawer: () => setDrawerOpen(true),
       closeDrawer: () => setDrawerOpen(false),
     }),
-    [ids, hydrated, add, remove, clear, isDrawerOpen]
+    [ids, add, remove, clear, isDrawerOpen]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

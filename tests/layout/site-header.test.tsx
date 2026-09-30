@@ -3,12 +3,15 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { SiteHeader } from "@/components/layout/site-header";
+import { CartProvider } from "@/components/cart/cart-store";
 import { mainNav } from "@/config/site";
 
 function renderHeader() {
   return render(
     <ThemeProviderStub>
-      <SiteHeader />
+      <CartProvider>
+        <SiteHeader />
+      </CartProvider>
     </ThemeProviderStub>
   );
 }
