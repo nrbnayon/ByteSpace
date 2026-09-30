@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { useCart } from "@/components/cart/cart-store";
 import { mainNav, siteConfig } from "@/config/site";
 import { MdOutlineShoppingBag } from "react-icons/md";
 
@@ -14,9 +15,37 @@ import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { count, openDrawer } = useCart();
+  // Hide-on-scroll-down / show-on-scroll-up, with a solid band once scrolled
+  // so the white nav text stays readable over page content.
+  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 8);
+      if (y > lastY + 4 && y > 120) setHidden(true);
+      else if (y < lastY - 4) setHidden(false);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="absolute inset-x-0 top-0 z-40">
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-40 transition-[transform,background-color,box-shadow] duration-300 ease-out",
+        "motion-reduce:transition-none",
+        hidden ? "-translate-y-full" : "translate-y-0",
+        scrolled
+          ? "border-b border-white/15 bg-[#003be2]/70 shadow-lg shadow-black/5 backdrop-blur-xl dark:bg-[#0034c4]/70"
+          : "bg-transparent border-b border-transparent"
+      )
+      }
+    >
       <Container className="relative flex h-20 items-center justify-between py-0 lg:h-24">
         <Link
           href="/"
@@ -59,10 +88,19 @@ export function SiteHeader() {
           </Button>
           <button
             type="button"
-            aria-label="Open cart"
-            className="inline-flex size-10 items-center justify-center rounded-full text-surface-brand-foreground transition-colors hover:bg-surface-brand-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            onClick={openDrawer}
+            aria-label={count > 0 ? `Open cart, ${count} item${count === 1 ? "" : "s"}` : "Open cart"}
+            className="relative inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-surface-brand-foreground transition-colors hover:bg-surface-brand-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             <MdOutlineShoppingBag className="size-5" aria-hidden="true" />
+            {count > 0 ? (
+              <span
+                aria-hidden="true"
+                className="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-secondary-foreground"
+              >
+                {count}
+              </span>
+            ) : null}
           </button>
         </div>
 
@@ -71,7 +109,10 @@ export function SiteHeader() {
           <ThemeToggle variant="brand" type="dropdown" />
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => {
+              setOpen((v) => !v);
+              setHidden(false);
+            }}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}

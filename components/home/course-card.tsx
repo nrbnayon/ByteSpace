@@ -18,7 +18,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
   return (
     <article
       className={cn(
-        "relative flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-border bg-card transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5",
+        "group relative flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10",
         className
       )}
     >
@@ -29,7 +29,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
           alt=""
           fill
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 373px"
-          className="object-cover"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <ul className="absolute bottom-3 left-3 flex flex-wrap gap-2">
           {course.highlights.map((highlight, i) => {

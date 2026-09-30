@@ -18,7 +18,7 @@ export function LearningPaths() {
           {learningPaths.map((path) => (
             <li key={path.id} className="w-full max-w-[167px]">
               <Link
-                href="/#courses"
+                href={`/search?q=${encodeURIComponent(path.label)}`}
                 className="group flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-3xl border border-border bg-card transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 <span className="flex size-14 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground transition-transform duration-300 group-hover:scale-110">
