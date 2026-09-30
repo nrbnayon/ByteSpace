@@ -17,7 +17,7 @@ export type NavLink = {
 export const mainNav: readonly NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Courses", href: "/search" },
-  { label: "Creators", href: "/#creators" },
+  { label: "Creators", href: "/creators/purepearl-studio" },
 ];
 
 /** Footer link columns – exactly as in the design (3 columns × 5 links, no headings). */

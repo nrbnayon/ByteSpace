@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import Link from "next/link";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
@@ -34,7 +35,7 @@ describe("Button", () => {
   it("renders as a link when asChild is used", () => {
     render(
       <Button asChild>
-        <a href="/courses">Browse courses</a>
+        <Link href="/courses">Browse courses</Link>
       </Button>
     );
     expect(
