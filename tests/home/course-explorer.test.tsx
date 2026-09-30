@@ -64,6 +64,40 @@ describe("CourseExplorer", () => {
     expect(headings.length).toBe(courses.length);
   });
 
+  it("reveals hidden categories via the + More expander and filters by them", async () => {
+    const user = userEvent.setup();
+    render(<CourseExplorer />);
+
+    expect(screen.queryByRole("button", { name: "Design" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "More" }));
+    expect(screen.getByRole("button", { name: "Design" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Design" }));
+    // Both design-tagged courses show; non-design ones don't.
+    expect(screen.getByRole("heading", { name: "Learn Figma from Basic" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Build Digital Asset" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "The Power of Big Data" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("collapses with − Less and resets a stranded active category", async () => {
+    const user = userEvent.setup();
+    render(<CourseExplorer />);
+
+    await user.click(screen.getByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("button", { name: "Business" }));
+    expect(
+      screen.getByRole("heading", { name: "Mastering Money Management" })
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Less" }));
+    expect(screen.queryByRole("button", { name: "Business" })).not.toBeInTheDocument();
+    // Active hidden category resets to Featured → all courses shown again.
+    expect(screen.getByRole("heading", { name: "Learn Figma from Basic" })).toBeInTheDocument();
+  });
+
   it("has no accessibility violations", async () => {
     const { container } = render(<CourseExplorer />);
     // axe on a large subtree — assert no critical violations.
