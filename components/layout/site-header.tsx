@@ -17,7 +17,7 @@ export function SiteHeader() {
 
   return (
     <header className="absolute inset-x-0 top-0 z-40">
-      <Container className="flex h-20 items-center justify-between gap-6 py-0 lg:h-24">
+      <Container className="relative flex h-20 items-center justify-between py-0 lg:h-24">
         <Link
           href="/"
           className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
@@ -26,9 +26,12 @@ export function SiteHeader() {
           <Logo className="text-surface-brand-foreground [&_span]:text-surface-brand-foreground" />
         </Link>
 
-        {/* Primary navigation — shown only when there is room (lg+) */}
-        <nav aria-label="Main" className="hidden lg:block">
-          <ul className="flex items-center gap-8">
+        {/* Primary navigation — accurately centered across the header */}
+        <nav
+          aria-label="Main"
+          className="hidden lg:absolute lg:left-1/2 lg:top-1/2 lg:flex lg:-translate-x-1/2 lg:-translate-y-1/2"
+        >
+          <ul className="flex items-center gap-6 xl:gap-8">
             {mainNav.map((link) => (
               <li key={link.href}>
                 <Link
@@ -42,12 +45,16 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-5 lg:flex">
-          <ThemeToggle variant="brand" />
-          <Button asChild variant="ghost" className="text-surface-brand-foreground hover:bg-surface-brand-foreground/10 hover:text-surface-brand-foreground">
+        <div className="hidden items-center gap-2 lg:flex">
+          <ThemeToggle variant="brand" type="dropdown" />
+          <Button
+            asChild
+            variant="ghost"
+            className="h-10 px-3.5 text-surface-brand-foreground hover:bg-surface-brand-foreground/10 hover:text-surface-brand-foreground"
+          >
             <Link href="/sign-in">Sign In</Link>
           </Button>
-          <Button asChild variant="secondary" size="sm">
+          <Button asChild variant="secondary" size="sm" className="h-10 px-5">
             <Link href="/sign-up">Join Us</Link>
           </Button>
           <button
@@ -61,7 +68,7 @@ export function SiteHeader() {
 
         {/* Compact controls — below lg the nav lives in the disclosure panel */}
         <div className="flex items-center gap-2 lg:hidden">
-          <ThemeToggle variant="brand" />
+          <ThemeToggle variant="brand" type="dropdown" />
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
