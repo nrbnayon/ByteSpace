@@ -12,6 +12,7 @@ import { categoryTabs } from "@/data/categories";
 import { courses } from "@/data/courses";
 import type { Creator } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { GridLines } from "@/components/ui/grid-lines";
 
 const LEVELS = ["Beginner", "Intermediate", "Advanced"] as const;
 
@@ -73,8 +74,11 @@ export function CreatorProfile({ creator }: { creator: Creator }) {
   return (
     <>
       {/* Blue band header */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-[#003be2] dark:bg-[#0034c4]">
-        <div className="absolute inset-0 auth-grid [--g:64px] lg:[--g:120px]" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] overflow-hidden bg-[#003be2]"
+      >
+        <GridLines />
       </div>
 
       <Container className="relative pt-28 lg:pt-32">

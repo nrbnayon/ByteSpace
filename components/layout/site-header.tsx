@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
@@ -10,41 +10,88 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { useCart } from "@/components/cart/cart-store";
 import { mainNav, siteConfig } from "@/config/site";
 import { MdOutlineShoppingBag } from "react-icons/md";
-
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { count, openDrawer } = useCart();
-  // Hide-on-scroll-down / show-on-scroll-up, with a solid band once scrolled
-  // so the white nav text stays readable over page content.
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
+  /**
+   * Scroll behaviour — runs entirely outside React state so there are
+   * no re-renders to race against the CSS transition.
+   *
+   * Instead of toggling classes we drive two data attributes on the
+   * <header> element directly:
+   *   data-scrolled  → frosted-glass band
+   *   data-hidden    → -translate-y-full
+   *
+   * The CSS transition is always present, so both the hide and the
+   * reveal animations use the same duration / easing and are equally
+   * smooth.
+   */
   useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
     let lastY = window.scrollY;
-    const onScroll = () => {
+    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+
+    const update = () => {
+      rafId = null;
       const y = window.scrollY;
-      setScrolled(y > 8);
-      if (y > lastY + 4 && y > 120) setHidden(true);
-      else if (y < lastY - 4) setHidden(false);
+
+      // Frosted-glass background once we leave the very top
+      if (y > 8) {
+        header.setAttribute("data-scrolled", "");
+      } else {
+        header.removeAttribute("data-scrolled");
+      }
+
+      // Hide on scroll-down (threshold: 4 px movement + past 120 px)
+      // Reveal on scroll-up (threshold: 4 px)
+      if (y > lastY + 4 && y > 120) {
+        header.setAttribute("data-hidden", "");
+      } else if (y < lastY - 4) {
+        header.removeAttribute("data-hidden");
+      }
+
       lastY = y;
     };
+
+    const onScroll = () => {
+      // One rAF per frame — prevents stacking multiple updates per scroll event burst
+      if (!rafId) rafId = requestAnimationFrame(update);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
+
+  /** Force-reveal the header when the mobile menu opens. */
+  const revealHeader = () => headerRef.current?.removeAttribute("data-hidden");
 
   return (
     <header
+      ref={headerRef}
       className={cn(
-        "fixed inset-x-0 top-0 z-40 transition-[transform,background-color,box-shadow] duration-300 ease-out",
+        "fixed inset-x-0 top-0 z-40",
+        // Transition always on — identical easing in both hide & reveal directions
+        "transition-[transform,background-color,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
         "motion-reduce:transition-none",
-        hidden ? "-translate-y-full" : "translate-y-0",
-        scrolled
-          ? "border-b border-white/15 bg-[#003be2]/70 shadow-lg shadow-black/5 backdrop-blur-xl dark:bg-[#0034c4]/70"
-          : "bg-transparent border-b border-transparent"
-      )
-      }
+        // Base (top of page, unscrolled)
+        "border-b border-transparent bg-transparent",
+        // Scrolled — frosted glass band (data attribute set by scroll handler)
+        "data-[scrolled]:border-b data-[scrolled]:border-white/15",
+        "data-[scrolled]:bg-[#003be2]/70 dark:data-[scrolled]:bg-[#0034c4]/70",
+        "data-[scrolled]:shadow-lg data-[scrolled]:shadow-black/5",
+        "data-[scrolled]:backdrop-blur-xl",
+        // Hidden — translate the whole header off-screen upward
+        "data-[hidden]:-translate-y-full"
+      )}
     >
       <Container className="relative flex h-20 items-center justify-between py-0 lg:h-24">
         <Link
@@ -111,7 +158,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => {
               setOpen((v) => !v);
-              setHidden(false);
+              revealHeader();
             }}
             aria-expanded={open}
             aria-controls="mobile-nav"

@@ -10,6 +10,7 @@ import { EnrollCard } from "@/components/courses/enroll-card";
 import { CourseAboutPanel } from "@/components/courses/course-about-panel";
 import { CourseLessonsPanel } from "@/components/courses/course-lessons-panel";
 import { CourseReviewsPanel } from "@/components/courses/course-reviews-panel";
+import { GridLines } from "@/components/ui/grid-lines";
 import { CourseCard } from "@/components/home/course-card";
 import { searchCatalog } from "@/data/search-catalog";
 import type { CourseDetail } from "@/lib/types";
@@ -34,9 +35,9 @@ export function CourseDetail({ course }: { course: CourseDetail }) {
       {/* Blue band behind header + header block only */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 -z-10 h-[560px] bg-[#003be2] dark:bg-[#0034c4] lg:h-[660px]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] overflow-hidden bg-[#003be2] lg:h-[660px]"
       >
-        <div className="absolute inset-0 auth-grid [--g:64px] lg:[--g:120px]" />
+        <GridLines />
       </div>
 
       <Container className="relative pt-28 lg:pt-32">
