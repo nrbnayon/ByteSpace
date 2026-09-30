@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Search, Star } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -103,6 +104,7 @@ const card =
 
 export function Hero() {
   const rootRef = useRef<HTMLElement>(null);
+  const router = useRouter();
 
   // Exact container width + fit-to-screen scale (before first paint)
   useLayoutEffect(() => {
@@ -317,7 +319,13 @@ export function Hero() {
             data-hero="search"
             role="search"
             aria-label="Course search"
-            onSubmit={(e) => e.preventDefault()}
+            action="/search"
+            method="get"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = new FormData(e.currentTarget).get("q");
+              router.push(typeof q === "string" && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search");
+            }}
             className="flex w-full max-w-[600px] items-center gap-4 opacity-0 lg:w-auto lg:max-w-none"
           >
             <label className="flex h-[52px] min-w-0 flex-1 items-center gap-2 rounded-3xl bg-white px-6 py-3 focus-within:ring-2 focus-within:ring-[#d4fb20] lg:w-[461px] lg:flex-none">

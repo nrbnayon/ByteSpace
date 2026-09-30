@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Clock, MessageSquare, PlaySquare } from "lucide-react";
 import { AvatarStack } from "@/components/ui/avatar-stack";
 import { Rating } from "@/components/ui/rating";
@@ -17,7 +18,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
   return (
     <article
       className={cn(
-        "flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-border bg-card transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5",
+        "relative flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-border bg-card transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5",
         className
       )}
     >
@@ -51,7 +52,12 @@ export function CourseCard({ course, className }: CourseCardProps) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="truncate text-xl font-semibold tracking-tight">
-              {course.title}
+              <Link
+                href={`/courses/${course.id}`}
+                className="rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring after:absolute after:inset-0"
+              >
+                {course.title}
+              </Link>
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               by <span className="font-medium text-primary">{course.instructor}</span>
