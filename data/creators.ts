@@ -15,7 +15,7 @@ export const creators: readonly Creator[] = [
       "Welcome to the creative world of PurePearl Studio. Here, you'll discover the passion, expertise, and inspiration that drive our creative journey. Let's explore and learn together!",
       "Dive into our creative portfolio, showcasing a glimpse of our artistic endeavors. From digital designs to multimedia projects, each piece tells a unique story. Explore the world of creativity with us.",
     ],
-    avatar: { src: "/images/avatars/avatar-1.png", width: 160, height: 160 },
+    avatar: { src: "/images/creator/author.png", width: 160, height: 160 },
     followers: 12,
     productIds: [
       "learn-figma-from-basic",

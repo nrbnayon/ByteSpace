@@ -1,12 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import {
+  Check,
   FolderOpen,
   MessageCircleMore,
   PlaySquare,
   Video,
 } from "lucide-react";
+import { useState } from "react";
+import { useCart } from "@/components/cart/cart-store";
 import { getCreator } from "@/data/creators";
 import type { CourseDetail } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const includeIcons = {
   folder: FolderOpen,
@@ -23,6 +29,21 @@ const includeIcons = {
 export function EnrollCard({ course }: { course: CourseDetail }) {
   const creator = getCreator(course.creatorSlug);
   const creatorHref = `/creators/${course.creatorSlug}`;
+  const { has, add, remove, openDrawer } = useCart();
+  const inCart = has(course.id);
+  const [announced, setAnnounced] = useState("");
+
+  function toggleCart() {
+    if (inCart) {
+      remove(course.id);
+      setAnnounced(`${course.title} removed from cart`);
+    } else {
+      add(course.id);
+      setAnnounced(`${course.title} added to cart`);
+      openDrawer();
+    }
+    window.setTimeout(() => setAnnounced(""), 2500);
+  }
 
   return (
     <aside
@@ -61,10 +82,23 @@ export function EnrollCard({ course }: { course: CourseDetail }) {
 
       <button
         type="button"
-        className="mt-5 h-13 w-full cursor-pointer rounded-3xl bg-secondary text-lg font-medium text-secondary-foreground transition duration-200 hover:-translate-y-0.5 hover:brightness-95 active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        onClick={toggleCart}
+        aria-pressed={inCart}
+        className={cn(
+          "mt-5 h-13 w-full cursor-pointer rounded-3xl text-lg font-medium transition duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          inCart
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "bg-secondary text-secondary-foreground hover:brightness-95"
+        )}
       >
-        Enroll Now
+        <span className="inline-flex items-center gap-2">
+          {inCart ? <Check className="size-5" aria-hidden="true" /> : null}
+          {inCart ? "Added to Cart" : "Enroll Now"}
+        </span>
       </button>
+      <span role="status" aria-live="polite" className="sr-only">
+        {announced}
+      </span>
 
       <h3 className="mt-8 font-heading text-xl font-semibold tracking-tight text-foreground">
         This course include

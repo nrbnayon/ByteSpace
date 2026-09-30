@@ -3,8 +3,9 @@ import { BarChart3, Star, Users } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { MetaPill } from "@/components/ui/meta-pill";
 import { ShareButton } from "@/components/ui/share-button";
+import { Reveal } from "@/components/ui/reveal";
 import { Tabs } from "@/components/ui/tabs";
-import { CourseVideo } from "@/components/courses/course-video";
+import { CourseVideo } from "@/components/courses/demo-video";
 import { EnrollCard } from "@/components/courses/enroll-card";
 import { CourseAboutPanel } from "@/components/courses/course-about-panel";
 import { CourseLessonsPanel } from "@/components/courses/course-lessons-panel";
@@ -85,7 +86,7 @@ export function CourseDetail({ course }: { course: CourseDetail }) {
         {/* Main grid: video + tabs in column 1, enroll card spanning both rows */}
         <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-12">
           <div className="min-w-0">
-            <CourseVideo course={course} />
+            <CourseVideo course={course} className="motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-700" />
           </div>
           <div className="lg:row-span-2">
             <EnrollCard course={course} />
@@ -123,13 +124,9 @@ export function CourseDetail({ course }: { course: CourseDetail }) {
             </div>
             <div className="mt-8 grid grid-cols-1 justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item, i) => (
-                <div
-                  key={item.id}
-                  className="w-full motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-3 motion-safe:fill-mode-both duration-500"
-                  style={{ animationDelay: `${i * 70}ms` }}
-                >
+                <Reveal key={item.id} delay={i * 70} className="w-full">
                   <CourseCard course={item} />
-                </div>
+                </Reveal>
               ))}
             </div>
           </Container>

@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Chip } from "@/components/ui/chip";
 import { CourseCard } from "@/components/home/course-card";
 import { FollowButton } from "@/components/creators/follow-button";
+import { Reveal } from "@/components/ui/reveal";
 import { categoryTabs } from "@/data/categories";
 import { courses } from "@/data/courses";
 import type { Creator } from "@/lib/types";
@@ -83,7 +84,7 @@ export function CreatorProfile({ creator }: { creator: Creator }) {
             alt=""
             width={creator.avatar.width}
             height={creator.avatar.height}
-            className="size-20 rounded-2xl object-cover lg:size-24"
+            className="size-20 rounded-lg object-cover lg:size-24"
           />
           <div className="min-w-0">
             <h1 className="flex flex-wrap items-center gap-3 font-heading text-3xl font-semibold tracking-tight text-white lg:text-5xl">
@@ -97,10 +98,10 @@ export function CreatorProfile({ creator }: { creator: Creator }) {
         </div>
 
         <div className="mt-8 max-w-4xl space-y-3">
-          {creator.bio.map((paragraph) => (
-            <p key={paragraph.slice(0, 32)} className="text-pretty leading-[1.7] text-white/90">
-              {paragraph}
-            </p>
+          {creator.bio.map((paragraph, i) => (
+            <Reveal key={paragraph.slice(0, 32)} delay={i * 100}>
+              <p className="text-pretty leading-[1.7] text-white/90">{paragraph}</p>
+            </Reveal>
           ))}
         </div>
 
@@ -260,13 +261,9 @@ export function CreatorProfile({ creator }: { creator: Creator }) {
 
           <div className="mt-10 grid grid-cols-1 justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((course, i) => (
-              <div
-                key={course.id}
-                className="w-full motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-3 motion-safe:fill-mode-both duration-500"
-                style={{ animationDelay: `${Math.min(i, 8) * 70}ms` }}
-              >
+              <Reveal key={course.id} delay={Math.min(i, 8) * 70} className="w-full">
                 <CourseCard course={course} />
-              </div>
+              </Reveal>
             ))}
           </div>
 

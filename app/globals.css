@@ -168,6 +168,8 @@
 
   html {
     @apply font-sans scroll-smooth;
+    /* Fixed, self-hiding header — keep anchors clear of it. */
+    scroll-padding-top: 6rem;
   }
 
   body {

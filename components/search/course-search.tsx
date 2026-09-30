@@ -14,6 +14,7 @@ import {
 import { Container } from "@/components/ui/container";
 import { Chip } from "@/components/ui/chip";
 import { CourseCard } from "@/components/home/course-card";
+import { Reveal } from "@/components/ui/reveal";
 import { categoryTabs } from "@/data/categories";
 import { searchCatalog } from "@/data/search-catalog";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,17 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZE = 18;
 
 const LEVELS = ["Beginner", "Intermediate", "Advanced"] as const;
+
+/**
+ * Learning-path labels (from the home page cards) that have no matching
+ * category id — aliased to the closest real category so links like
+ * /search?q=IT%20%26%20Software land on actual courses.
+ */
+const QUERY_CATEGORY_ALIASES: Record<string, string> = {
+  development: "web-development",
+  "it & software": "web-development",
+  it: "web-development",
+};
 
 const SORTS = [
   { value: "relevance", label: "Most relevant" },
@@ -89,12 +101,14 @@ export function CourseSearch() {
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
+    const aliasCategory = QUERY_CATEGORY_ALIASES[needle];
     let list = searchCatalog.filter((course) => {
       const matchesQuery =
         needle === "" ||
         course.title.toLowerCase().includes(needle) ||
         course.instructor.toLowerCase().includes(needle) ||
-        course.categories.some((c) => c.replace(/-/g, " ").includes(needle));
+        course.categories.some((c) => c.replace(/-/g, " ").includes(needle)) ||
+        (aliasCategory ? course.categories.includes(aliasCategory) : false);
       const matchesCategory = category === "featured" || course.categories.includes(category);
       const matchesLevel = level === "" || course.level === level;
       return matchesQuery && matchesCategory && matchesLevel;
@@ -334,13 +348,9 @@ export function CourseSearch() {
             className="mt-10 grid grid-cols-1 justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3"
           >
             {pageItems.map((course, i) => (
-              <div
-                key={course.id}
-                className="w-full motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-3 motion-safe:fill-mode-both duration-500"
-                style={{ animationDelay: `${Math.min(i, 8) * 70}ms` }}
-              >
+              <Reveal key={course.id} delay={Math.min(i, 8) * 70} className="w-full">
                 <CourseCard course={course} />
-              </div>
+              </Reveal>
             ))}
           </div>
 

@@ -6,6 +6,9 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { ScrollReset } from "@/components/layout/scroll-reset";
+import { CartProvider } from "@/components/cart/cart-store";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { SkipLink } from "@/components/layout/skip-link";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
@@ -86,14 +89,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col">
         <ThemeProvider>
+          <CartProvider>
           <div id="site-chrome" className="contents">
             <SkipLink />
+            <ScrollReset />
             <SiteHeader />
             <main id="main-content" className="flex-1">
               {children}
             </main>
             <SiteFooter />
+            <CartDrawer />
           </div>
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

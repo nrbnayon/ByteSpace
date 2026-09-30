@@ -6,6 +6,7 @@ import { Chip } from "@/components/ui/chip";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { CourseCard } from "@/components/home/course-card";
+import { Reveal } from "@/components/ui/reveal";
 import { categoryTabs } from "@/data/categories";
 import { courses } from "@/data/courses";
 
@@ -90,13 +91,9 @@ export function CourseExplorer() {
           className="mt-12 grid grid-cols-1 justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3"
         >
           {filtered.map((course, i) => (
-            <div
-              key={course.id}
-              className="w-full motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-3 motion-safe:fill-mode-both duration-500"
-              style={{ animationDelay: `${Math.min(i, 8) * 70}ms` }}
-            >
+            <Reveal key={course.id} delay={Math.min(i, 8) * 70} className="w-full">
               <CourseCard course={course} />
-            </div>
+            </Reveal>
           ))}
         </div>
 
