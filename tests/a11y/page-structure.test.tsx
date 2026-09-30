@@ -42,7 +42,9 @@ describe("SiteFooter", () => {
 
   it("newsletter email input is programmatically labelled", () => {
     render(<SiteFooter />);
-    const input = screen.getByLabelText("Subscribe to our newsletter");
+    const input = screen.getByLabelText(
+      "Stay Up to date with our latest features and releases by joining our newsletter."
+    );
     expect(input).toHaveAttribute("type", "email");
   });
 
