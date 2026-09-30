@@ -16,7 +16,7 @@ export type NavLink = {
 
 export const mainNav: readonly NavLink[] = [
   { label: "Home", href: "/" },
-  { label: "Courses", href: "/#courses" },
+  { label: "Courses", href: "/search" },
   { label: "Creators", href: "/#creators" },
 ];
 
