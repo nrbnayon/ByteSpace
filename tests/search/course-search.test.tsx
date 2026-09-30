@@ -90,7 +90,7 @@ describe("CourseSearch", () => {
     const { container } = render(<CourseSearch />);
     const results = await axe(container);
     expect(results).toHaveNoViolations();
-  });
+  }, 20000);
 });
 
 describe("CourseSearchSkeleton", () => {

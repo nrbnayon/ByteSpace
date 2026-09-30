@@ -270,18 +270,19 @@
   }
 }
 
-/* ─── Auth pages ─────────────────────────────────────────────────────────
-   Blue canvas with the faint white grid from the sign-up design. */
+/* ─── Shared Brand Grid ──────────────────────────────────────────────────
+   Blue canvas with the 2px faint white grid centered horizontally. */
 .auth-grid {
   background-image:
-    linear-gradient(to right, rgb(255 255 255 / 9%) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 9%) 1px, transparent 1px);
-  background-size: 120px 120px;
-  background-position: -1px -1px;
+    linear-gradient(to right, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+  background-size: var(--g, 120px) var(--g, 120px);
+  background-position: calc(50% + var(--g, 120px) / 2) var(--g, 120px);
 }
 
 @media (max-width: 1023px) {
   .auth-grid {
-    background-size: 64px 64px;
+    background-size: var(--g, 64px) var(--g, 64px);
+    background-position: calc(50% + var(--g, 64px) / 2) var(--g, 64px);
   }
 }

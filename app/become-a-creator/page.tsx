@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { GridLines } from "@/components/ui/grid-lines";
 import { CreatorApplicationForm } from "@/components/creators/creator-application-form";
 
 export const metadata: Metadata = {
@@ -46,16 +47,28 @@ const steps = [
 export default function BecomeACreatorPage() {
   return (
     <>
-      <section aria-labelledby="creator-cta-title" className="py-20 lg:py-28">
+      {/* ── Hero band — same blue grid design as hero / not-found ── */}
+      <section
+        aria-labelledby="creator-cta-title"
+        className="relative isolate overflow-hidden bg-[#003be2] pb-16 pt-32 text-white sm:pb-20 sm:pt-36 lg:pb-24 lg:pt-40"
+      >
+        <GridLines />
+
         <Container>
           <SectionHeading
             id="creator-cta-title"
             align="left"
             title="Teach what you know. Earn while you sleep."
             subtitle="ByteSpace supports individuals and entities in creating, publishing, and administering educational courses. Apply to join our creator community and turn your expertise into a course learners love."
+            className="[&_h2]:text-white [&_p]:text-white/80"
           />
+        </Container>
+      </section>
 
-          <div className="mt-14 grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-20">
+      {/* ── Body — perks, steps, and application form ── */}
+      <section className="py-16 lg:py-24">
+        <Container>
+          <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-20">
             <div className="flex flex-col gap-12">
               <section aria-labelledby="perks-title">
                 <h2
@@ -119,3 +132,4 @@ export default function BecomeACreatorPage() {
     </>
   );
 }
+

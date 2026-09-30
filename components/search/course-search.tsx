@@ -18,6 +18,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { categoryTabs } from "@/data/categories";
 import { searchCatalog } from "@/data/search-catalog";
 import { cn } from "@/lib/utils";
+import { GridLines } from "@/components/ui/grid-lines";
 
 /** Results grid — 18 cards per page (3 columns × 6 rows on desktop). */
 const PAGE_SIZE = 18;
@@ -131,12 +132,9 @@ export function CourseSearch() {
       {/* ── Blue search band ── */}
       <section
         aria-labelledby="search-title"
-        className="relative isolate overflow-hidden bg-[#003be2] pb-14 pt-28 text-white lg:pb-16 lg:pt-36 dark:bg-[#0034c4]"
+        className="relative isolate overflow-hidden bg-[#003be2] pb-16 pt-32 text-white sm:pb-20 sm:pt-36 lg:pb-20 lg:pt-40"
       >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 auth-grid [--g:64px] lg:[--g:120px]"
-        />
+        <GridLines />
         <Container className="flex flex-col items-center gap-8">
           <h1
             id="search-title"

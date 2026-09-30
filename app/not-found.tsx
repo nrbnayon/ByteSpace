@@ -1,16 +1,9 @@
-import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { GridLines } from "@/components/ui/grid-lines";
 
 const satoshi = "font-[family-name:var(--font-satoshi)]";
 const poppins = "font-[family-name:var(--font-poppins)]";
-
-const gridStyle: CSSProperties = {
-  backgroundImage:
-    "linear-gradient(to right, rgba(255,255,255,.1) 2px, transparent 2px), linear-gradient(to bottom, rgba(255,255,255,.1) 2px, transparent 2px)",
-  backgroundSize: "var(--g) var(--g)",
-  backgroundPosition: "calc(50% + var(--g) / 2) var(--g)",
-};
 
 export default function NotFound() {
   return (
@@ -18,11 +11,7 @@ export default function NotFound() {
       className={`${satoshi} relative isolate flex min-h-[510px] items-center justify-center overflow-hidden bg-[#003be2] px-5 pb-16 pt-28 text-white sm:min-h-screen sm:px-8`}
     >
       {/* Grid (120px cells on desktop, 64px on mobile) - matches Hero exactly */}
-      <div
-        aria-hidden="true"
-        style={gridStyle}
-        className="pointer-events-none absolute inset-0 -z-10 [--g:64px] lg:[--g:120px]"
-      />
+      <GridLines />
 
       <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center text-center">
         <p
