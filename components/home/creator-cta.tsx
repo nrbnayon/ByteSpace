@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -262,12 +263,12 @@ export function CreatorCta() {
           </p>
 
           <div data-anim data-copy="cta" className="opacity-0">
-            <button
-              type="button"
-              className="cursor-pointer rounded-3xl bg-[#d4fb20] px-6 py-3 text-lg font-medium leading-[1.2] text-[#242528] transition duration-200 hover:-translate-y-0.5 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white active:translate-y-0 active:scale-95"
+            <Link
+              href="/become-a-creator"
+              className="inline-block cursor-pointer rounded-3xl bg-[#d4fb20] px-6 py-3 text-lg font-medium leading-[1.2] text-[#242528] transition duration-200 hover:-translate-y-0.5 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white active:translate-y-0 active:scale-95"
             >
               Join as Creator
-            </button>
+            </Link>
           </div>
         </div>
       </div>

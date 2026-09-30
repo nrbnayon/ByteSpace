@@ -1,16 +1,30 @@
-# ByteSpace — Course Marketplace Landing Page
+# ByteSpace — Course Marketplace
 
-A pixel-faithful conversion of the Figma reference design into a modern **Next.js 16 (App Router)** application with Tailwind CSS v4, a full light/dark/auto theme system, and a component-driven architecture.
+A pixel-faithful conversion of the Figma reference design into a modern **Next.js 16 (App Router)** application with Tailwind CSS v4, a full light/dark/auto theme system, a component-driven architecture, and a complete course-marketplace UX: search, course detail pages, creator profiles, a persistent cart, and a creator application flow.
+
+## Routes
+
+| Route | Type | Description |
+| --- | --- | --- |
+| `/` | Static | Landing page — hero, partners, course explorer, learning paths, growth, testimonials |
+| `/search` | Static + client | Course search: query, category/level filters, sorting, pagination (18/page), skeleton loading state |
+| `/courses/[id]` | SSG ×90 | Course detail: video preview, sticky enroll card, About/Lessons/Reviews tabs, ratings summary, related courses |
+| `/creators/[id]` | SSG | Creator profile: stats, follow, filterable product grid |
+| `/become-a-creator` | Static | Creator pitch + validated application form |
+| `/legal/[slug]` | SSG ×3 | Privacy Policy, Terms of Service, Cookies Settings |
+| `/sign-in`, `/sign-up` | Static | Auth pages (no header/footer chrome) |
+| `/robots.txt`, `/sitemap.xml` | — | SEO routes (all course/creator URLs included) |
 
 ## Stack
 
 | Layer | Choice |
 | --- | --- |
-| Framework | Next.js 16 (App Router, Turbopack, static prerender) |
-| Styling | Tailwind CSS v4 (CSS-first `@theme` tokens) |
-| Typography | Poppins (headings) · Satoshi (body) · Clash Display (wordmark) — all self-hosted via `next/font` |
-| Icons | lucide-react |
-| Testing | Vitest + Testing Library + jest-axe (a11y assertions) |
+| Framework | Next.js 16 (App Router, Turbopack, static prerender/SSG) |
+| Styling | Tailwind CSS v4 (CSS-first `@theme` tokens) + `tw-animate-css` |
+| Typography | Poppins (headings) · Satoshi (body) · Clash Display (wordmark) — self-hosted via `next/font` |
+| Animation | GSAP + ScrollTrigger (hero, growth section) · CSS/tw-animate entrances · IntersectionObserver `Reveal` scroll animations |
+| Icons | lucide-react · react-icons |
+| Testing | Vitest + Testing Library + jest-axe (a11y assertions) — **77 tests** |
 | Quality | TypeScript strict · ESLint (core-web-vitals + react-hooks v7) |
 
 ## Design tokens
@@ -27,50 +41,86 @@ Fonts are wired as Tailwind utilities: `font-sans` (Satoshi), `font-heading` (Po
 ## Theme system (auto / dynamic)
 
 - `ThemeProvider` reads theme state from an **external store** ([`components/theme/theme-store.ts`](components/theme/theme-store.ts)) via `useSyncExternalStore` — no setState-in-effect cascades, hydration-safe, cross-tab sync, and live OS-preference tracking.
-- Modes: **light / dark / system** (default follows `prefers-color-scheme`).
+- Modes: **light / dark / system** (light is the default; `system` follows `prefers-color-scheme`).
 - A tiny inline script in `<head>` applies the resolved class **before first paint** — zero FOUC.
 - The toggle ([`components/theme/theme-toggle.tsx`](components/theme/theme-toggle.tsx)) is a labelled `radiogroup` with an `aria-live` announcement; it renders in `brand` variant on blue bands and `default` variant elsewhere.
+
+## Key features
+
+### Search & discovery
+- URL-driven state (`?q=&category=&level=&sort=&page=`) — shareable, back/forward-safe
+- Full-text matching over titles, instructors, and categories, with aliasing so learning-path links (e.g. `?q=IT & Software` from the home cards) resolve to real courses
+- Filter dropdowns (check-marked selections, outside-click close), lime category chips, four sort modes
+- 5-window pagination, `aria-live` result counts, empty states, and a card-grid skeleton mirroring the real layout (no layout shift when content arrives)
+
+### Course pages
+- Blue grid band with the white enroll card overlapping the band edge, exactly as the design
+- Video preview as a **lite-embed facade** (poster + accessible play button → `youtube-nocookie` iframe with autoplay; swap `DEMO_YOUTUBE_ID` for real lesson videos)
+- WAI-ARIA tabs (roving tabindex, arrow keys) for About / Lessons / Reviews
+- Reviews: ratings summary card, star-filter chips, live region announcements
+- **Enroll Now** adds the course to the cart (toggle), opens the drawer, and announces the action
+
+### Cart
+- localStorage-persisted via `useSyncExternalStore` ([`components/cart/cart-store.tsx`](components/cart/cart-store.tsx)) — survives reloads, syncs across tabs, hydration-safe
+- Slide-over drawer ([`components/cart/cart-drawer.tsx`](components/cart/cart-drawer.tsx)): line items, remove, total, checkout CTA (sign-in gated), empty state; `role="dialog"` with focus management and Escape to close
+- Header bag button shows a live count badge with an updated accessible name
+
+### Motion & scroll UX
+- Fixed header hides on scroll-down, returns on scroll-up, and gains a frosted-glass band (`bg/70` + `backdrop-blur-xl`) when scrolled
+- `ScrollReset` ([`components/layout/scroll-reset.tsx`](components/layout/scroll-reset.tsx)) lands every route change at the top instantly (no smooth-scroll racing)
+- `Reveal` ([`components/ui/reveal.tsx`](components/ui/reveal.tsx)) — once-only scroll reveals with stagger, used on card grids, bios, and media
+- Course cards lift with a cover-image zoom on hover; all motion respects `prefers-reduced-motion`
 
 ## Folder structure
 
 ```
-app/                  # App Router routes (layout, page, not-found, robots.ts, sitemap.ts)
+app/                  # App Router routes (incl. search/, courses/[id]/, creators/[id]/, become-a-creator/, legal/[slug]/)
   fonts/              # Self-hosted font binaries + OFL licenses
 components/
-  ui/                 # Generic primitives (Button, Chip, Rating, AvatarStack, …)
-  layout/             # SiteHeader, SiteFooter, SkipLink, NewsletterForm
-  home/               # Feature sections (Hero, CourseExplorer, Testimonials, …)
+  ui/                 # Generic primitives (Button, Chip, Tabs, Rating, RatingSummary,
+  │                   #   ReviewCard, MetaPill, ShareButton, Reveal, AvatarStack, …)
+  layout/             # SiteHeader (hide-on-scroll), SiteFooter, SkipLink, ScrollReset
+  home/               # Feature sections (Hero, CourseExplorer, LearningPaths, Testimonials, …)
+  search/             # CourseSearch + skeleton components
+  courses/            # CourseDetail, EnrollCard, video facade, About/Lessons/Reviews panels
+  creators/           # CreatorProfile, FollowButton, application form
+  cart/               # CartProvider store + CartDrawer
   theme/              # ThemeProvider, ThemeToggle, theme-store
   brand/              # Logo lockup
   seo/                # JsonLd structured-data component
-config/site.ts        # Single source of truth: brand info + navigation
-data/                 # Typed content datasets (courses, categories, testimonials, stats)
+config/site.ts        # Single source of truth: brand info + navigation + footer links
+data/                 # Typed datasets (courses, search-catalog, course-details, creators,
+                      #   categories, testimonials, legal, stats)
 lib/                  # fonts.ts, theme.ts, seo.ts, types.ts, utils.ts
 public/images/        # Semantic asset tree: brand/ hero/ courses/ avatars/ categories/ partners/ patterns/ growth/
-tests/                # Vitest suites (unit + interaction + jest-axe a11y)
+tests/                # Vitest suites (unit + interaction + jest-axe a11y) — 77 tests
 ```
 
 ## Accessibility
 
-- Skip link, semantic landmarks, labelled regions, correct heading outline
-- Course filtering is a `group` of `aria-pressed` toggle chips with an `aria-live` result announcement
-- Decorative imagery is `alt=""`; meaningful images carry descriptive alt text; avatar stacks use one group label
-- `prefers-reduced-motion` disables all animation (GSAP entrance/parallax, marquee, smooth scroll)
-- `jest-axe` assertions on primitives, sections, and interactive flows
+- Skip link, semantic landmarks, labelled regions, correct heading outline (including visually-hidden section headings where grids follow an `h1`)
+- WAI-ARIA tabs with full keyboard support; `aria-pressed` toggles for chips, filters, follow, and enroll
+- Live regions for filter results, review counts, cart/share/follow confirmations, and form status
+- Forms: labelled fields, `aria-invalid` + `aria-describedby` error wiring, success announcements
+- Dialogs: `aria-modal`, focus trap-in/focus-restore, Escape to close
+- Decorative imagery is `alt=""`; avatar stacks use one group label; off-canvas drawer is hidden from the tree when closed
+- `prefers-reduced-motion` disables all animation (GSAP entrances, reveals, marquee, smooth scroll, header transition)
+- `jest-axe` assertions on primitives, sections, pages, and interactive flows
 
 ## SEO
 
-- Metadata API with `metadataBase`, Open Graph, Twitter cards, robots directives
-- `app/robots.ts` + `app/sitemap.ts` routes
-- JSON-LD: `Organization`, `WebSite` (+ `SearchAction`), and `ItemList` of `Course` schema ([`lib/seo.ts`](lib/seo.ts))
+- Metadata API with `metadataBase`, Open Graph, Twitter cards, per-route titles/descriptions
+- `noindex` on auth, search, and application pages; indexable course/creator pages
+- `app/robots.ts` + `app/sitemap.ts` (home, search, all course and creator URLs)
+- JSON-LD: `Organization`, `WebSite` (+ `SearchAction`), `ItemList` of courses, per-course `Course` schema with `AggregateRating` and `Offer`, creator `ProfilePage` ([`lib/seo.ts`](lib/seo.ts))
 - Responsive `viewport` + light/dark `theme-color`
 
 ## Commands
 
 ```bash
 npm run dev          # develop at localhost:3000
-npm run build        # production build (fully static)
-npm run test         # vitest run (36 tests)
+npm run build        # production build (static + SSG prerender)
+npm run test         # vitest run (77 tests)
 npm run test:watch   # vitest watch mode
 npm run test:coverage
 npm run lint         # eslint
@@ -81,10 +131,22 @@ npm run typecheck    # tsc --noEmit
 
 - **Hero** — below `lg` the stage is fluid (natural stacking); from `lg` it renders the exact 1440×1024 Figma canvas, scaled proportionally via a CSS `--s` factor, so desktop matches the design 1:1 at any width.
 - **Partners** — infinite marquee with mask fade (paused under reduced motion).
-- **Course grid** — 1 → 2 → 3 columns; **learning paths** — 2 → 3 → 6 columns.
-- **Header** — desktop nav/actions collapse into an accessible disclosure menu on mobile.
+- **Course grids** — 1 → 2 → 3 columns on search, explorer, creator, and related-course sections; learning paths 2 → 3 → 6.
+- **Course detail** — enroll card is sticky beside the tabs on `lg`, stacks below the video on mobile; blue band height adapts per breakpoint.
+- **Header** — desktop nav/actions collapse into an accessible disclosure menu below `lg`; the bag badge, glass band, and hide/show behavior work at every width.
+
+## Content architecture
+
+All page content is typed data, never hardcoded in components:
+
+- `data/courses.ts` — the six real courses (source of truth for course cards site-wide)
+- `data/search-catalog.ts` — the catalog expanded to 90 items for the paginated search demo (single swap point for a real API)
+- `data/course-details.ts` — one bespoke detail record matching the design + a generator that layers consistent defaults onto every catalog course
+- `data/creators.ts` — creator profiles whose `productIds` reference real course ids
+- `data/legal.ts` — structured legal document content
 
 ## License notes
 
 - Satoshi & Clash Display: SIL Open Font License 1.1 (see `app/fonts/**/OFL.txt`)
 - Course/gallery photography: Unsplash (via the reference design)
+- Demo preview video: "Big Buck Bunny" © Blender Foundation (youtube-nocookie embed)
