@@ -1,6 +1,24 @@
-# ByteSpace — Course Marketplace
+# ByteSpace
 
-A pixel-faithful conversion of the Figma reference design into a modern **Next.js 16 (App Router)** application with Tailwind CSS v4, a full light/dark/auto theme system, a component-driven architecture, and a complete course-marketplace UX: search, course detail pages, creator profiles, a persistent cart, and a creator application flow.
+> **A modern online course marketplace — from Figma design to production-ready Next.js app.**
+
+## About
+
+ByteSpace is a fully featured **online learning platform** built as a pixel-faithful implementation of a professional Figma design. It brings together a complete course marketplace experience — from browsing and searching thousands of courses, to enrolling, reviewing instructor profiles, and managing a persistent shopping cart.
+
+The project serves as a real-world reference for building scalable, accessible, and visually polished Next.js applications. Every part of the design — typography, color tokens, spacing, motion, and component structure — has been faithfully translated from Figma into code.
+
+### Highlights
+
+- 🎨 **Design-accurate UI** — 1440 px canvas scaled with a CSS `--s` factor to match Figma 1:1 at any screen width
+- 🌙 **Auto theme system** — light / dark / system modes with zero FOUC, cross-tab sync, and a live OS-preference watcher
+- 🔍 **URL-driven search** — full-text filtering, category & level chips, four sort modes, 5-window pagination — all shareable via the URL
+- 🛒 **Persistent cart** — `localStorage`-backed via `useSyncExternalStore`, syncs across tabs, hydration-safe
+- ♿ **Accessibility-first** — skip link, WAI-ARIA tabs, live regions, focus management, `jest-axe` assertions on every component
+- 🚀 **Static-first delivery** — SSG for 90 course pages and all creator profiles; Turbopack in development
+- 🧪 **77 tests** — Vitest + Testing Library + jest-axe covering UI primitives, interactions, and a11y
+
+Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, **GSAP**, and **TypeScript** (strict mode).
 
 ## Routes
 
