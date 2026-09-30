@@ -36,14 +36,14 @@ export function SectionHeading({
       <Tag
         id={id}
         className={cn(
-          "max-w-[46rem] text-balance",
+          "max-w-[50rem] text-balance",
           size === "lg" ? "text-4xl lg:text-[2.75rem] lg:leading-[1.2]" : "text-3xl lg:text-4xl lg:leading-[1.2]"
         )}
       >
         {title}
       </Tag>
       {subtitle ? (
-        <p className="max-w-3xl text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
+        <p className="max-w-4xl text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
           {subtitle}
         </p>
       ) : null}

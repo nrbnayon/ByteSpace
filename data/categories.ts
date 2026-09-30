@@ -20,6 +20,9 @@ export const categoryTabs: readonly CategoryTab[] = [
   { id: "web-development", label: "Web Development" },
   { id: "data-science", label: "Data Science" },
   { id: "cooking", label: "Cooking" },
+  // Real course categories surfaced via the "+ More" expander
+  { id: "design", label: "Design" },
+  { id: "business", label: "Business" },
 ];
 
 /** Six big cards in "Explore Diverse Learning Paths". */

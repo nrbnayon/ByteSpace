@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { SkipLink } from "@/components/layout/skip-link";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -34,9 +34,10 @@ describe("SiteFooter", () => {
   it("renders a contentinfo landmark with labelled nav columns", () => {
     render(<SiteFooter />);
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Footer" })).toBeInTheDocument();
+    const footerNav = screen.getByRole("navigation", { name: "Footer" });
+    // Heading-less columns per the current design; column titles are links.
     expect(
-      screen.getByRole("heading", { name: "Become a Creator" })
+      within(footerNav).getByRole("link", { name: "Become a Creator" })
     ).toBeInTheDocument();
   });
 
