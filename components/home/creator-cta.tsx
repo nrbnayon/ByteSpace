@@ -9,7 +9,7 @@ export function CreatorCta() {
       className="relative isolate overflow-hidden bg-surface-brand py-20 text-surface-brand-foreground lg:py-24"
     >
       <Image
-        src="/images/patterns/grid-lines.svg"
+        src="/images/creator/grid-lines.svg"
         alt=""
         fill
         sizes="100vw"

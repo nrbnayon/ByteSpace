@@ -17,27 +17,35 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
  * Radial glow palette from the Figma spec (node 22-321), kept as CSS
  * gradients — resolution-independent, themeable via CSS vars, and cheaper
  * than shipping raster/SVG glow files. Order = paint order.
+ *
+ * Geometry was pixel-probed from the original design render so the five
+ * glows sit exactly where Figma placed them (peak alpha values are the
+ * effective ones measured on the #FAFAFA ground, not the raw node values).
  */
 const GLOW_LAYERS = [
-  // Lime, top-left, large & soft
+  // Lime bloom, top-left — the section's dominant glow, clipped by the top edge
   "radial-gradient(50% 50% at 50% 50%, rgba(203, 252, 1, 0.4) 0%, rgba(203, 252, 1, 0.092) 53%, rgba(203, 252, 1, 0.024) 75%, rgba(203, 252, 1, 0) 100%)",
-  // Blue, bottom-left, faint
-  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.08) 0%, rgba(0, 59, 226, 0.0184) 53%, rgba(0, 59, 226, 0.0048) 75%, rgba(0, 59, 226, 0) 100%)",
-  // Blue, right, strong
-  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.24) 0%, rgba(0, 59, 226, 0.0552) 53%, rgba(0, 59, 226, 0.0144) 75%, rgba(0, 59, 226, 0) 100%)",
-  // Blue, mid-left, medium
+  // Blue wash, mid-left edge (center off-canvas)
   "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.16) 0%, rgba(0, 59, 226, 0.0368) 53%, rgba(0, 59, 226, 0.0096) 75%, rgba(0, 59, 226, 0) 100%)",
-  // Lime, bottom-left, strongest core
+  // Blue wash, top-right edge (center off-canvas)
+  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.08) 0%, rgba(0, 59, 226, 0.0184) 53%, rgba(0, 59, 226, 0.0048) 75%, rgba(0, 59, 226, 0) 100%)",
+  // Blue wash, bottom-right corner — strongest blue, hugging the edge
+  "radial-gradient(50% 50% at 50% 50%, rgba(0, 59, 226, 0.24) 0%, rgba(0, 59, 226, 0.0552) 53%, rgba(0, 59, 226, 0.0144) 75%, rgba(0, 59, 226, 0) 100%)",
+  // Lime core, bottom-left — small & intense (r=336 node @ 0.6)
   "radial-gradient(50% 50% at 50% 50%, rgba(203, 252, 1, 0.6) 0%, rgba(203, 252, 1, 0.138) 53%, rgba(203, 252, 1, 0.036) 75%, rgba(203, 252, 1, 0) 100%)",
 ] as const;
 
-/** Where each glow sits and how big it is (percent of the section box). */
+/**
+ * Where each glow sits and how big it is (percent of the section box),
+ * matching the probed Figma centers/edges — centers in the middle of the
+ * box, half-extents = radii; negative offsets let glows bleed off-section.
+ */
 const GLOW_BOXES = [
-  "left-[-18%] top-[-30%] h-[110%] w-[70%]",
-  "bottom-[-35%] left-[-15%] h-[95%] w-[65%]",
-  "right-[-22%] top-[-10%] h-[120%] w-[80%]",
-  "left-[-25%] top-[25%] h-[85%] w-[55%]",
-  "bottom-[-30%] left-[5%] h-[90%] w-[60%]",
+  "left-[7%] top-[-42%] h-[88%] w-[43%]",
+  "left-[-35%] top-[18%] h-[60%] w-[60%]",
+  "right-[-28%] top-[-22%] h-[60%] w-[60%]",
+  "right-[-38%] bottom-[-49%] h-[85%] w-[84%]",
+  "left-[-18%] bottom-[-5%] h-[33%] w-[33%]",
 ] as const;
 
 export function ProfessionalGrowth() {
