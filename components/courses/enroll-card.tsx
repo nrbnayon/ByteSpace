@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   Check,
@@ -32,6 +33,9 @@ export function EnrollCard({ course }: { course: CourseDetail }) {
   const { has, add, remove, openDrawer } = useCart();
   const inCart = has(course.id);
   const [announced, setAnnounced] = useState("");
+  // The design's card teases the first three lessons; the full outline
+  // lives on the Lessons tab.
+  const teaserLessons = course.lessons.slice(0, 3);
 
   function toggleCart() {
     if (inCart) {
@@ -55,13 +59,15 @@ export function EnrollCard({ course }: { course: CourseDetail }) {
       </h2>
 
       <ol className="mt-6 flex flex-col gap-4">
-        {course.lessons.map((lesson, i) => (
+        {teaserLessons.map((lesson, i) => (
           <li key={lesson.title} className="flex items-start justify-between gap-4">
             <span className="flex min-w-0 gap-3">
               <span className="shrink-0 text-base font-medium text-foreground">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <span className="text-base leading-[1.6] text-foreground">{lesson.title}</span>
+              <span className="text-base leading-[1.6] text-foreground">
+                {lesson.title.replace(/^Module \d+:\s*/, "")}
+              </span>
             </span>
             <span className="shrink-0 text-sm font-medium text-primary">{lesson.duration}</span>
           </li>
@@ -116,12 +122,21 @@ export function EnrollCard({ course }: { course: CourseDetail }) {
       </ul>
 
       <div className="mt-8 border-t border-border pt-6">
-        <p className="flex items-center gap-3">
-          <span className="font-medium text-foreground">{course.instructor}</span>
-          <span className="text-sm text-muted-foreground">
-            {creator?.role ?? "Professional Creator"}
+        <div className="flex items-center gap-3">
+          <Image
+            src={creator?.avatar.src ?? "/images/avatars/avatar-1.png"}
+            alt=""
+            width={creator?.avatar.width ?? 160}
+            height={creator?.avatar.height ?? 160}
+            className="size-12 shrink-0 rounded-full object-cover"
+          />
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate font-medium text-foreground">{course.instructor}</span>
+            <span className="text-sm text-muted-foreground">
+              {creator?.role ?? "Professional Creator"}
+            </span>
           </span>
-        </p>
+        </div>
         <p className="mt-3 text-base leading-[1.6] text-muted-foreground">
           Ready to Dive In? Enroll Now and Start Building Your Digital Future!
         </p>

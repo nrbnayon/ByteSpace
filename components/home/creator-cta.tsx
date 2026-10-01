@@ -246,7 +246,7 @@ export function CreatorCta() {
             id="cta-title"
             data-anim
             data-copy="title"
-            className={`${poppins} max-w-[680px] text-balance text-4xl font-semibold leading-[1.2] tracking-[-0.01em] text-[#f5f5f6] opacity-0 sm:text-[2.5rem] lg:w-[680px] lg:text-[44px] lg:[text-wrap:wrap]`}
+            className={`${poppins} max-w-[680px] text-balance text-3xl font-semibold leading-[1.2] tracking-[-0.01em] text-[#f5f5f6] opacity-0 sm:text-[2.5rem] lg:w-[680px] lg:text-[44px] lg:[text-wrap:wrap]`}
           >
             Unlock Your Potential as a Creator with ByteSpace
           </h2>

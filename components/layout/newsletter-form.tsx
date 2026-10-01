@@ -38,7 +38,7 @@ export function NewsletterForm() {
             You&apos;re in! Watch your inbox for new courses.
           </p>
         ) : (
-          <div className="flex w-full items-center gap-3 sm:gap-6">
+          <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:gap-6">
             <input
               id={emailId}
               type="email"
@@ -46,7 +46,7 @@ export function NewsletterForm() {
               autoComplete="email"
               required
               placeholder="Enter your email"
-              className="h-[52px] min-w-0 flex-1 rounded-full border border-[#d0d2d6] bg-white px-6 text-base leading-[1.6] text-[#242528] outline-none transition-[border-color,box-shadow] placeholder:text-[#242528]/70 focus-visible:border-[#003be2] focus-visible:ring-2 focus-visible:ring-[#003be2]/20 dark:border-white/25 dark:bg-transparent dark:text-white dark:placeholder:text-white/60"
+              className="h-[52px] min-w-0 rounded-full border border-[#d0d2d6] bg-white px-6 text-base leading-[1.6] text-[#242528] outline-none transition-[border-color,box-shadow] placeholder:text-[#242528]/70 focus-visible:border-[#003be2] focus-visible:ring-2 focus-visible:ring-[#003be2]/20 dark:border-white/25 dark:bg-transparent dark:text-white dark:placeholder:text-white/60"
             />
             <button
               type="submit"

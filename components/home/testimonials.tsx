@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { Container } from "@/components/ui/container";
+import { TestimonialCards } from "@/components/home/testimonial-cards";
 import { TESTIMONIALS_INTRO, testimonials } from "@/data/testimonials";
 
 /**
@@ -7,7 +7,9 @@ import { TESTIMONIALS_INTRO, testimonials } from "@/data/testimonials";
  * left, intro right), three borderless white cards with a stacked layout
  * (large avatar, name, blue role, quote), over a soft lime/blue glow
  * background. Glow paints on one layer (same seam-free approach as the
- * growth section) with dark-mode dimming on the wrapper.
+ * growth section) with dark-mode dimming on the wrapper. On desktop the
+ * cards auto-cycle one position left in a loop (see testimonial-cards.tsx);
+ * below lg or with reduced motion they render as a static grid.
  */
 const GLOWS = [
   // Lime bloom, top-center-left behind the intro column
@@ -39,7 +41,7 @@ export function Testimonials() {
         <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-20">
           <h2
             id="testimonials-title"
-            className="max-w-[32rem] text-balance text-4xl leading-[1.2] tracking-[-0.02em] lg:text-[3.25rem]"
+            className="max-w-[40rem] text-balance text-4xl leading-[1.2] tracking-[-0.02em] lg:text-[3.25rem]"
           >
             Discover What Our Community Is Saying
           </h2>
@@ -48,31 +50,8 @@ export function Testimonials() {
           </p>
         </div>
 
-        {/* Cards */}
-        <ul className="mt-14 grid gap-8 md:grid-cols-2 lg:mt-20 lg:grid-cols-3">
-          {testimonials.map((testimonial) => (
-            <li key={testimonial.id}>
-              <figure className="flex h-full flex-col gap-4 rounded-3xl bg-card p-7 shadow-[0_24px_60px_-32px_rgba(16,19,34,0.18)] lg:gap-5 lg:p-8">
-                <Image
-                  src={testimonial.avatar.src}
-                  alt=""
-                  width={testimonial.avatar.width}
-                  height={testimonial.avatar.height}
-                  className="size-16 rounded-full object-cover lg:size-[5.5rem]"
-                />
-                <figcaption className="flex flex-col">
-                  <span className="font-heading text-xl font-semibold text-foreground">
-                    {testimonial.name}
-                  </span>
-                  <span className="mt-0.5 text-lg text-primary">{testimonial.role}</span>
-                </figcaption>
-                <blockquote className="mt-2 text-pretty text-base leading-relaxed text-muted-foreground">
-                  <p>&quot;{testimonial.quote}&quot;</p>
-                </blockquote>
-              </figure>
-            </li>
-          ))}
-        </ul>
+        {/* Cards — auto-cycling carousel on desktop, static grid below lg */}
+        <TestimonialCards items={testimonials} />
       </Container>
     </section>
   );

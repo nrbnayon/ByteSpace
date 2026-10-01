@@ -12,9 +12,34 @@ import { mainNav, siteConfig } from "@/config/site";
 import { MdOutlineShoppingBag } from "react-icons/md";
 import { cn } from "@/lib/utils";
 
+/**
+ * Cart trigger with live count badge. Rendered in the desktop actions and
+ * in the compact mobile controls so the cart is reachable at every width.
+ */
+function CartButton() {
+  const { count, openDrawer } = useCart();
+  return (
+    <button
+      type="button"
+      onClick={openDrawer}
+      aria-label={count > 0 ? `Open cart, ${count} item${count === 1 ? "" : "s"}` : "Open cart"}
+      className="relative inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-surface-brand-foreground transition-colors hover:bg-surface-brand-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      <MdOutlineShoppingBag className="size-5" aria-hidden="true" />
+      {count > 0 ? (
+        <span
+          aria-hidden="true"
+          className="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-secondary-foreground"
+        >
+          {count}
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const { count, openDrawer } = useCart();
   const headerRef = useRef<HTMLElement>(null);
 
   /**
@@ -133,27 +158,13 @@ export function SiteHeader() {
           <Button asChild variant="secondary" size="sm" className="h-10 px-5">
             <Link href="/sign-up">Join Us</Link>
           </Button>
-          <button
-            type="button"
-            onClick={openDrawer}
-            aria-label={count > 0 ? `Open cart, ${count} item${count === 1 ? "" : "s"}` : "Open cart"}
-            className="relative inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-surface-brand-foreground transition-colors hover:bg-surface-brand-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            <MdOutlineShoppingBag className="size-5" aria-hidden="true" />
-            {count > 0 ? (
-              <span
-                aria-hidden="true"
-                className="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-secondary-foreground"
-              >
-                {count}
-              </span>
-            ) : null}
-          </button>
+          <CartButton />
         </div>
 
         {/* Compact controls — below lg the nav lives in the disclosure panel */}
         <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle variant="brand" type="dropdown" />
+          <CartButton />
           <button
             type="button"
             onClick={() => {
