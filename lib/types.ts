@@ -27,6 +27,8 @@ export type Course = {
 export type CourseLesson = {
   title: string;
   duration: string;
+  /** One-line summary shown under the title on the Lessons tab. */
+  description?: string;
 };
 
 /** A learner review shown in the course Reviews tab. */

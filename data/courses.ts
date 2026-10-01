@@ -6,7 +6,7 @@ export const courses: readonly Course[] = [
   {
     id: "learn-figma-from-basic",
     title: "Learn Figma from Basic",
-    instructor: "purepearl studio",
+    instructor: "PurePearl Studio",
     image: {
       src: "/images/courses/learn-figma-from-basic.jpg",
       width: 698,
@@ -23,7 +23,7 @@ export const courses: readonly Course[] = [
   {
     id: "build-digital-asset",
     title: "Build Digital Asset",
-    instructor: "purepearl studio",
+    instructor: "PurePearl Studio",
     image: {
       src: "/images/courses/build-digital-asset.jpg",
       width: 682,
@@ -40,7 +40,7 @@ export const courses: readonly Course[] = [
   {
     id: "the-power-of-big-data",
     title: "the Power of Big Data",
-    instructor: "purepearl studio",
+    instructor: "PurePearl Studio",
     image: {
       src: "/images/courses/the-power-of-big-data.jpg",
       width: 682,
@@ -57,7 +57,7 @@ export const courses: readonly Course[] = [
   {
     id: "balancing-productivity-and-self-care",
     title: "Balancing Productivity and Self-Care",
-    instructor: "purepearl studio",
+    instructor: "PurePearl Studio",
     image: {
       src: "/images/courses/balancing-productivity-and-self-care.jpg",
       width: 682,
@@ -74,7 +74,7 @@ export const courses: readonly Course[] = [
   {
     id: "mastering-money-management",
     title: "Mastering Money Management",
-    instructor: "purepearl studio",
+    instructor: "PurePearl Studio",
     image: {
       src: "/images/courses/mastering-money-management.jpg",
       width: 682,
@@ -91,7 +91,7 @@ export const courses: readonly Course[] = [
   {
     id: "from-idea-to-startup-success",
     title: "From Idea to Startup Success",
-    instructor: "purepearl studio",
+    instructor: "PurePearl Studio",
     image: {
       src: "/images/courses/from-idea-to-startup-success.jpg",
       width: 682,

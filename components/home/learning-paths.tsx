@@ -6,7 +6,7 @@ import { categoryIconSrc, learningPaths } from "@/data/categories";
 
 export function LearningPaths() {
   return (
-    <section aria-labelledby="paths-title" className="py-20 lg:py-28">
+    <section aria-labelledby="paths-title" className="pb-16 pt-4 lg:py-20">
       <Container>
         <SectionHeading
           id="paths-title"
@@ -27,7 +27,7 @@ export function LearningPaths() {
                     alt=""
                     width={36}
                     height={36}
-                    className="size-9 dark:invert"
+                    className="size-9"
                   />
                 </span>
                 <span className="px-2 text-center text-lg font-medium">{path.label}</span>
