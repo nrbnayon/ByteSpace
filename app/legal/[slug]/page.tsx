@@ -13,8 +13,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const doc = getLegalDoc(slug);
-  if (!doc) return { title: "Not found — ByteSpace" };
-  return { title: `${doc.title} — ByteSpace`, description: doc.description };
+  if (!doc) return { title: "Not found" };
+  return { title: doc.title, description: doc.description };
 }
 
 export default async function LegalPage({ params }: PageProps) {

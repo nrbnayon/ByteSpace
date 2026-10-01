@@ -14,11 +14,12 @@ The project serves as a real-world reference for building scalable, accessible, 
 - 🌙 **Auto theme system** — light / dark / system modes with zero FOUC, cross-tab sync, and a live OS-preference watcher
 - 🔍 **URL-driven search** — full-text filtering, category & level chips, four sort modes, 5-window pagination — all shareable via the URL
 - 🛒 **Persistent cart** — `localStorage`-backed via `useSyncExternalStore`, syncs across tabs, hydration-safe
+- 📴 **Installable PWA with offline support** — Serwist service worker precaches the app shell, caches visited pages at runtime, and serves a branded offline page when there's no connection
 - ♿ **Accessibility-first** — skip link, WAI-ARIA tabs, live regions, focus management, `jest-axe` assertions on every component
 - 🚀 **Static-first delivery** — SSG for 90 course pages and all creator profiles; Turbopack in development
-- 🧪 **77 tests** — Vitest + Testing Library + jest-axe covering UI primitives, interactions, and a11y
+- 🧪 **83 tests** — Vitest + Testing Library + jest-axe covering UI primitives, interactions, a11y, and the PWA surface
 
-Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, **GSAP**, and **TypeScript** (strict mode).
+Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, **GSAP**, **Serwist**, and **TypeScript** (strict mode).
 
 ## Routes
 
@@ -32,6 +33,9 @@ Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, **GSAP**, and **Ty
 | `/legal/[slug]` | SSG ×3 | Privacy Policy, Terms of Service, Cookies Settings |
 | `/sign-in`, `/sign-up` | Static | Auth pages (no header/footer chrome) |
 | `/robots.txt`, `/sitemap.xml` | — | SEO routes (all course/creator URLs included) |
+| `/manifest.webmanifest` | Static | PWA web app manifest — name, standalone display, brand colors, icon sets |
+| `/serwist/sw.js` | Static | Service worker (Serwist build, esbuild-bundled and prerendered) |
+| `/~offline` | Static | Branded offline fallback, precached by the service worker |
 
 ## Stack
 
@@ -44,6 +48,7 @@ Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, **GSAP**, and **Ty
 | Icons | lucide-react · react-icons |
 | Testing | Vitest + Testing Library + jest-axe (a11y assertions) — **77 tests** |
 | Quality | TypeScript strict · ESLint (core-web-vitals + react-hooks v7) |
+| PWA / offline | Serwist (`@serwist/turbopack`) — Workbox-based precache + runtime caching |
 
 ## Design tokens
 
@@ -89,10 +94,21 @@ Fonts are wired as Tailwind utilities: `font-sans` (Satoshi), `font-heading` (Po
 - `Reveal` ([`components/ui/reveal.tsx`](components/ui/reveal.tsx)) — once-only scroll reveals with stagger, used on card grids, bios, and media
 - Course cards lift with a cover-image zoom on hover; all motion respects `prefers-reduced-motion`
 
+## PWA & offline support
+
+ByteSpace is an installable Progressive Web App powered by [Serwist](https://serwist.pages.dev) — the actively maintained successor to `next-pwa` — using its Turbopack-native integration, so no webpack fallback is needed.
+
+- **Web app manifest** — [`app/manifest.ts`](app/manifest.ts): standalone display, brand `#003BE2` theme color, and any + maskable icon sets generated from the brand mark ([`scripts/generate-pwa-icons.mjs`](scripts/generate-pwa-icons.mjs))
+- **App shell precache** — the build prerenders the service worker via [`app/serwist/[path]/route.ts`](app/serwist/[path]/route.ts), precaching ~105 entries (every static asset + the offline page) so repeat loads are instant and network-free
+- **Runtime caching** — Next.js-tuned Workbox strategies: cache-first for immutable `/_next/static` JS, stale-while-revalidate for images/fonts/CSS, network-first for pages and RSC payloads — visited pages (and client-side navigation between them) keep working offline
+- **Offline fallback** — a branded [`/~offline`](app/~offline/page.tsx) page is precached and served for navigations that can't be served from cache, such as cold-starting the installed app without a connection
+- **Dev-safe** — registration is disabled during `next dev` so the cache never interferes with HMR; the SW is built and registered only in production
+- Oversized media (>2 MB, Workbox's default limit) is skipped by the precache to keep installs lean
+
 ## Folder structure
 
 ```
-app/                  # App Router routes (incl. search/, courses/[id]/, creators/[id]/, become-a-creator/, legal/[slug]/)
+app/                  # App Router routes (incl. search/, courses/[id]/, creators/[id]/, become-a-creator/, legal/[slug]/, serwist/[path]/, ~offline/, manifest.ts, sw.ts)
   fonts/              # Self-hosted font binaries + OFL licenses
 components/
   ui/                 # Generic primitives (Button, Chip, Tabs, Rating, RatingSummary,
@@ -111,7 +127,9 @@ data/                 # Typed datasets (courses, search-catalog, course-details,
                       #   categories, testimonials, legal, stats)
 lib/                  # fonts.ts, theme.ts, seo.ts, types.ts, utils.ts
 public/images/        # Semantic asset tree: brand/ hero/ courses/ avatars/ categories/ partners/ patterns/ growth/
-tests/                # Vitest suites (unit + interaction + jest-axe a11y) — 77 tests
+public/icons/         # PWA icons — any + maskable + apple-touch PNGs rasterized from the brand mark
+scripts/              # generate-pwa-icons.mjs (one-off PWA icon rasterizer)
+tests/                # Vitest suites (unit + interaction + jest-axe a11y, pwa) — 83 tests
 ```
 
 ## Accessibility
@@ -138,11 +156,12 @@ tests/                # Vitest suites (unit + interaction + jest-axe a11y) — 7
 ```bash
 npm run dev          # develop at localhost:3000
 npm run build        # production build (static + SSG prerender)
-npm run test         # vitest run (77 tests)
+npm run test         # vitest run (83 tests)
 npm run test:watch   # vitest watch mode
 npm run test:coverage
 npm run lint         # eslint
 npm run typecheck    # tsc --noEmit
+node scripts/generate-pwa-icons.mjs   # regenerate PWA icons from the brand mark (rarely needed)
 ```
 
 ## Responsive behavior

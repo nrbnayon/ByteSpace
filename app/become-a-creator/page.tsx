@@ -14,7 +14,7 @@ import { GridLines } from "@/components/ui/grid-lines";
 import { CreatorApplicationForm } from "@/components/creators/creator-application-form";
 
 export const metadata: Metadata = {
-  title: "Become a Creator — ByteSpace",
+  title: "Become a Creator",
   description:
     "Share your expertise on ByteSpace. Publish courses, reach learners worldwide, and get paid for what you know.",
   robots: { index: false, follow: true },

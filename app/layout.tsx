@@ -10,6 +10,7 @@ import { ScrollReset } from "@/components/layout/scroll-reset";
 import { CartProvider } from "@/components/cart/cart-store";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { SkipLink } from "@/components/layout/skip-link";
+import { SerwistProvider } from "@serwist/turbopack/react";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -53,6 +54,18 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: ["/images/hero/student.png"],
   },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: siteConfig.name,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
   robots: {
     index: true,
     follow: true,
@@ -90,6 +103,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <ThemeProvider>
           <CartProvider>
+          <SerwistProvider
+            swUrl="/serwist/sw.js"
+            // Never cache in development — stale chunks break HMR.
+            disable={process.env.NODE_ENV === "development"}
+          >
           <div id="site-chrome" className="contents">
             <SkipLink />
             <ScrollReset />
@@ -100,6 +118,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <SiteFooter />
             <CartDrawer />
           </div>
+          </SerwistProvider>
           </CartProvider>
         </ThemeProvider>
       </body>

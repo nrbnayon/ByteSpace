@@ -13,9 +13,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const creator = getCreator(id);
-  if (!creator) return { title: "Creator not found — ByteSpace" };
+  if (!creator) return { title: "Creator not found" };
   return {
-    title: `${creator.name} — ByteSpace`,
+    title: creator.name,
     description: creator.tagline,
   };
 }
